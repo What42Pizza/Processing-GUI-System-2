@@ -1,0 +1,24 @@
+ElementType:
+TextFrame
+
+Name:
+GUI_LoadedFrame
+
+XPos:
+0.1
+YPos:
+0.55
+XSize:
+0.1
+YSize:
+0.1
+
+Text:
+I loaded from a file!
+TextAlignY:
+-1
+TextSize:
+0.9
+
+Enabled:
+true
