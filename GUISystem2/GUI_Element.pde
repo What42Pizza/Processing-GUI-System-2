@@ -26,13 +26,6 @@ public class GUI_Element {
   public boolean RenderChildrenNotInFrame = true;
   public boolean UpdateChildrenNotInFrame = true;
   
-  public boolean IsDragging = false;
-  public boolean PrevMousePressed = false;
-  public int Dragging_StartMouseX;
-  public int Dragging_StartMouseY;
-  public float Dragging_StartXPos;
-  public float Dragging_StartYPos;
-  
   public String  Text = "Error: text not set";
   public String  PlaceholderText = "Click to enter text";
   public boolean UsePlaceholderText = true;
@@ -51,7 +44,7 @@ public class GUI_Element {
   public float  ImageXSize = 1;
   public float  ImageYSize = 1;
   
-  public color   PressedBackgroundColor = color (63);
+  public color   PressedBackgroundColor = color (79);
   public boolean UsePressedColor = true;
   public float   PressedXMove = 0;
   public float   PressedYMove = 1;
@@ -61,6 +54,25 @@ public class GUI_Element {
   public ArrayList <GUI_Element> Children = new ArrayList <GUI_Element> ();
   public GUI_Element Parent = null;
   public int FamilyLevel = 0;
+  
+  public boolean IsDragging = false;
+  public boolean PrevMousePressed = false;
+  public int Dragging_StartMouseX;
+  public int Dragging_StartMouseY;
+  public float Dragging_StartXPos;
+  public float Dragging_StartYPos;
+  
+  public int ScreenXPos  = 0;
+  public int ScreenYPos  = 0;
+  public int ScreenXSize = 0;
+  public int ScreenYSize = 0;
+  public int ScreenPressedXPos = 0;
+  public int ScreenPressedYPos = 0;
+  
+  
+  
+  
+  
   
   
   
@@ -328,36 +340,66 @@ public class GUI_Element {
   
   
   
+  
+  
   public void RenderBody() {
     
+    CalcScreenData();
+    
+    
     if (HasFrame) {
+      stroke (EdgeColor);
+      strokeWeight (EdgeSize);
       if (Pressed) {
-        GUIFunctions.DrawRect (XPos + PressedXMove / 300, YPos + PressedYMove / 300, XSize, YSize, PressedBackgroundColor, EdgeSize, EdgeColor);
+        fill (PressedBackgroundColor);
+        rect (ScreenPressedXPos, ScreenPressedYPos, ScreenXSize, ScreenYSize);
       } else {
-        GUIFunctions.DrawRect (XPos, YPos, XSize, YSize, BackgroundColor, EdgeSize, EdgeColor);
+        fill (BackgroundColor);
+        rect (ScreenXPos, ScreenYPos, ScreenXSize, ScreenYSize);
       }
     }
     
+    
     if (HasText) {
-      GUIFunctions.SetTextAlignment (TextAlignX, TextAlignY);
+      GUIFunctions.SetTextAlign (TextAlignX, TextAlignY); // Runs textAlign() with correct values
+      GUIFunctions.SetTextSize (TextSize, TextSizeIsRelativeTo, XPos, XSize); // Runs textSize() with correct values
       float TextXPos = XPos + XSize / 2 * (TextAlignX + 1);
       float TextYPos = YPos + YSize / 2 * (TextAlignY + 1);
       if (Pressed) {
         TextXPos += PressedXMove / 300;
         TextYPos += PressedYMove / 300;
       }
-      String TextToDisplay = Text + ((TextIsBeingEdited && (millis() % 1000) > 500) ? "|" : " ");
-      GUIFunctions.DrawText (TextToDisplay, TextXPos, TextYPos, TextColor, TextSize, TextSizeIsRelativeTo, XPos, XSize);
-    }
-    
-    if (HasImage && Image != null) {
-      if (Pressed) {
-        GUIFunctions.DrawImage (Image, XPos + PressedXMove / 300, YPos + PressedYMove / 300, XSize * ImageXSize, YSize * ImageYSize);
+      if (TextIsBeingEdited) {
+        String TextToDisplay = Text + (millis() % 1000 > 500 ? "|" : " ");
+        GUIFunctions.Text (TextToDisplay, TextXPos, TextYPos, TextColor);
       } else {
-        GUIFunctions.DrawImage (Image, XPos, YPos, XSize * ImageXSize, YSize * ImageYSize);
+        GUIFunctions.Text (Text, TextXPos, TextYPos, TextColor);
       }
     }
     
+    
+    if (HasImage && Image != null) {
+      if (Pressed) {
+        image (Image, ScreenPressedXPos, ScreenPressedYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
+      } else {
+        image (Image, ScreenXPos, ScreenYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
+      }
+    }
+    
+    
+  }
+  
+  
+  
+  public void CalcScreenData() {
+      ScreenXPos  = GUIFunctions.GetScreenX (XPos);
+  int ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
+      ScreenXSize = ScreenXEnd - ScreenXPos;
+      ScreenYPos  = GUIFunctions.GetScreenY (YPos);
+  int ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
+      ScreenYSize = ScreenYEnd - ScreenYPos;
+      ScreenPressedXPos = ScreenXPos + GUIFunctions.GetScreenX (PressedXMove / 300);
+      ScreenPressedYPos = ScreenYPos + GUIFunctions.GetScreenY (PressedYMove / 300);
   }
   
   

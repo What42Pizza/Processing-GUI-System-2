@@ -111,7 +111,7 @@ void keyPressed() {
 
 <br />
 
-- PressedBackgroundColor (default: color (63))
+- PressedBackgroundColor (default: color (79))
 - boolean UsePressedColor (default: false)
 - float PressedXMove (default: 0)
 - float PressedYMove (default: 1)
@@ -123,6 +123,15 @@ void keyPressed() {
 - ArrayList <GUI_Element> Children (default: new ArrayList <GUI_Element> ())
 - GUI_Element Parent (default: null)
 - int FamilyLevel (default: 0)
+
+<br />
+
+- int ScreenXPos (read only, only updates when rendered)
+- int ScreenYPos (read only, only updates when rendered)
+- int ScreenXSize (read only, only updates when rendered)
+- int ScreenYSize (read only, only updates when rendered)
+- int ScreenPressedXPos (read only, only updates when rendered)
+- int ScreenPressedYPos (read only, only updates when rendered)
 
 <br />
 <br />
@@ -346,4 +355,4 @@ Here's an example of how you would set up a GUI that loads GUI/StartingFrame:
 <br />
 <br />
 
-Last updated 10/09/20
+Last updated 10/13/20

@@ -93,6 +93,11 @@ public class GUI_Functions {
   
   
   
+  
+  
+  
+  
+  
   int LastUpdatedCount = 1; // >:(
   Character[] NewKeyPresses = new Character [0];
   ArrayList <Character> NewKeyPressesBuffer = new ArrayList <Character> ();
@@ -133,7 +138,13 @@ public class GUI_Functions {
   
   
   
-  public void DrawRect (float XPos, float YPos, float XSize, float YSize, color BackgroundColor, int EdgeSize, color EdgeColor) {
+  
+  
+  
+  
+  
+  /*
+  public void Rect (float XPos, float YPos, float XSize, float YSize) { // , color BackgroundColor, int EdgeSize, color EdgeColor) {
     
     int ScreenXPos  = GetScreenX (XPos);
     int ScreenXEnd  = GetScreenX (XPos + XSize);
@@ -142,28 +153,20 @@ public class GUI_Functions {
     int ScreenYEnd  = GetScreenY (YPos + YSize);
     int ScreenYSize = ScreenYEnd - ScreenYPos;
     
+    /*
     stroke (EdgeColor);
     strokeWeight (EdgeSize);
     fill (BackgroundColor);
+    */ /*
+    
     rect (ScreenXPos, ScreenYPos, ScreenXSize, ScreenYSize);
     
   }
+  */
   
   
   
-  public void DrawText (String Text, float TextXPos, float TextYPos, color TextColor, float TextSize, String TextSizeIsRelativeTo, float XPos, float XSize) {
-    
-    switch (TextSizeIsRelativeTo) {
-      case ("FRAME"):
-        textSize (GetScreenXSize (XPos, XSize) * TextSize / 10);
-        break;
-      case ("SCREEN"):
-        textSize (width * TextSize / 100);
-        break;
-      default:
-        println ("Error: TextSizeIsRelativeTo cannot be " + '"' + TextSizeIsRelativeTo + '"' + ", it has to be either " + '"' + "FRAME" + '"' + " or " + '"' + "SCREEN" + '"' + ".");
-        break;
-    }
+  public void Text (String Text, float TextXPos, float TextYPos, color TextColor) { //, float TextSize, String TextSizeIsRelativeTo, float XPos, float XSize) {
     
     fill (TextColor);
     text (Text, GetScreenX (TextXPos), GetScreenY (TextYPos));
@@ -172,7 +175,8 @@ public class GUI_Functions {
   
   
   
-  public void DrawImage (PImage Image, float XPos, float YPos, float XSize, float YSize) {
+  /*
+  public void Image (PImage Image, float XPos, float YPos, float XSize, float YSize) {
     
     int ScreenXPos  = GetScreenX (XPos);
     int ScreenXEnd  = GetScreenX (XPos + XSize);
@@ -184,6 +188,12 @@ public class GUI_Functions {
     image (Image, ScreenXPos, ScreenYPos, ScreenXSize, ScreenYSize);
     
   }
+  */
+  
+  
+  
+  
+  
   
   
   
@@ -192,9 +202,45 @@ public class GUI_Functions {
   int[] TextAlignConversionX = new int[] {37 , 3, 39 };
   int[] TextAlignConversionY = new int[] {101, 3, 102};
   
-  public void SetTextAlignment (int TextAlignX, int TextAlignY) {
+  
+  
+  public void SetTextAlign (int TextAlignX, int TextAlignY) {
     textAlign (TextAlignConversionX[TextAlignX+1], TextAlignConversionY[TextAlignY+1]);
   }
+  
+  
+  
+  public void SetTextSize (float TextSize, String TextSizeIsRelativeTo, float FrameXPos, float FrameXSize) {
+    switch (TextSizeIsRelativeTo) {
+      
+      case ("FRAME"):
+        textSize (GetScreenXSize (FrameXPos, FrameXSize) * TextSize / 10);
+        return;
+      
+      case ("SCREEN"):
+        textSize (width * TextSize / 100);
+        return;
+      
+      default:
+        println ("Error: TextSizeIsRelativeTo cannot be " + '"' + TextSizeIsRelativeTo + '"' + ", it has to be either " + '"' + "FRAME" + '"' + " or " + '"' + "SCREEN" + '"' + ".");
+        return;
+      
+    }
+  }
+  
+  
+  
+  public float[] GetAlignedPosition (float XPos, float YPos, float XSize, float YSize, int TextAlignX, int TextAlignY) {
+    return new float[] {
+      XPos + XSize / 2 * (TextAlignX + 1),
+      YPos + YSize / 2 * (TextAlignY + 1)
+    };
+  }
+  
+  
+  
+  
+  
   
   
   
