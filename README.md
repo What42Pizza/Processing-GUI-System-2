@@ -15,11 +15,15 @@ There are different basic types of GUI elements which can be used as presets, bu
 ### YOU NEED TO HAVE THE FOLLOWING CODE AT THE START OF YOUR PROGRAM FOR THIS TO WORK:
 
 ```
-GUI_Functions GUIFunctions = new GUI_Functions();
+GUI_Functions GUIFunctions = new GUI_Functions(); // YOU NEED TO HAVE THIS AT THE START OF YOUR PROGRAM FOR THIS TO WORK
 
 void keyPressed() {
-  GUIFunctions.keyPressed()
+  GUIFunctions.keyPressed();
   if (key == 27) key = 0;
+}
+
+void mouseWheel (MouseEvent E) {
+  GUIFunctions.mouseWheel(E);
 }
 ```
 
@@ -117,6 +121,17 @@ void keyPressed() {
 - float PressedYMove (default: 1)
 - boolean Pressed (read only)
 - boolean PrevPressed (read only)
+
+<br />
+
+- boolean CanScroll (default: false)
+- float ScrollSpeedX (default: 0)
+- float ScrollSpeedY (default: 1)
+- float TargetScrollX (default: 0, this is where the children are scrolling to)
+- float TargetScrollY (default: 0)
+- float CurrScrollX (default: 0, this is where the children currently are)
+- float CurrScrollY (default: 0)
+- float ReachTargetSpeed (default: 0.4, this is the percentage the children will move each frame)
 
 <br />
 
@@ -272,6 +287,14 @@ void keyPressed() {
 
 - HasFrame: true
 - HasImage: true
+
+<br />
+<br />
+
+### ScrollingFrame:
+
+- HasFrame: true
+- CanScroll: true
 
 <br />
 <br />

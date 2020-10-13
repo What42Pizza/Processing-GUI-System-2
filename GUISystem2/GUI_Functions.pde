@@ -98,13 +98,11 @@ public class GUI_Functions {
   
   
   
-  int LastUpdatedCount = 1; // >:(
+  int LastUpdatedCount_Keys = 1; // >:(
   Character[] NewKeyPresses = new Character [0];
   ArrayList <Character> NewKeyPressesBuffer = new ArrayList <Character> ();
   
-  
-  
-  public void keyPressed() {
+  public void keyPressed() { 
     NewKeyPressesBuffer.add (key);
   }
   
@@ -112,8 +110,8 @@ public class GUI_Functions {
   
   public Character[] GetNewKeyPresses() {
     
-    if (LastUpdatedCount != frameCount) { // If this is a start of a new frame
-      LastUpdatedCount = frameCount;
+    if (LastUpdatedCount_Keys != frameCount) { // If this is a start of a new frame
+      LastUpdatedCount_Keys = frameCount;
       NewKeyPresses = new Character [NewKeyPressesBuffer.size()];
       for (int i = 0; i < NewKeyPresses.length; i ++)
         NewKeyPresses[i] = NewKeyPressesBuffer.get(i);
@@ -132,6 +130,32 @@ public class GUI_Functions {
         return true;
     }
     return false;
+  }
+  
+  
+  
+  
+  
+  int LastUpdatedCount_Scroll = 1;
+  float ScrollAmount = 0;
+  float ScrollAmountBuffer = 0;
+  
+  public void mouseWheel (MouseEvent E) {
+    ScrollAmountBuffer += E.getCount();
+  }
+  
+  
+  
+  public float GetScrollAmount() {
+    
+    if (LastUpdatedCount_Scroll != frameCount) {
+      LastUpdatedCount_Scroll = frameCount;
+      ScrollAmount = ScrollAmountBuffer;
+      ScrollAmountBuffer = 0;
+    }
+    
+    return ScrollAmount;
+    
   }
   
   
@@ -470,6 +494,16 @@ public class GUI_Functions {
     
     
     
+    String ImageXSize = GetSetting (Properties, "ImageXSize");
+    if (ImageXSize != null)
+      Element.ImageXSize = float (ImageXSize);
+    
+    String ImageYSize = GetSetting (Properties, "ImageYSize");
+    if (ImageYSize != null)
+      Element.ImageYSize = float (ImageYSize);
+    
+    
+    
     String PressedBackgroundColor = GetSetting (Properties, "PressedBackgroundColor");
     if (PressedBackgroundColor != null)
       Element.PressedBackgroundColor = unhex (PressedBackgroundColor);
@@ -478,23 +512,47 @@ public class GUI_Functions {
     if (UsePressedColor != null)
       Element.UsePressedColor = boolean (UsePressedColor);
     
-    String XMove = GetSetting (Properties, "XMove");
+    String XMove = GetSetting (Properties, "PressedXMove");
     if (XMove != null)
       Element.PressedXMove = float (XMove);
     
-    String YMove = GetSetting (Properties, "YMove");
+    String YMove = GetSetting (Properties, "PressedYMove");
     if (YMove != null)
       Element.PressedYMove = float (YMove);
     
     
     
-    String ImageXSize = GetSetting (Properties, "ImageXSize");
-    if (ImageXSize != null)
-      Element.ImageXSize = float (ImageXSize);
+    String CanScroll = GetSetting (Properties, "CanScroll");
+    if (CanScroll != null)
+      Element.CanScroll = boolean (CanScroll);
     
-    String ImageYSize = GetSetting (Properties, "ImageYSize");
-    if (ImageYSize != null)
-      Element.ImageYSize = float (ImageYSize);
+    String ScrollSpeedX = GetSetting (Properties, "ScrollSpeedX");
+    if (ScrollSpeedX != null)
+      Element.ScrollSpeedX = float (ScrollSpeedX);
+    
+    String ScrollSpeedY = GetSetting (Properties, "ScrollSpeedY");
+    if (ScrollSpeedY != null)
+      Element.ScrollSpeedY = float (ScrollSpeedY);
+    
+    String TargetScrollX = GetSetting (Properties, "TargetScrollX");
+    if (TargetScrollX != null)
+      Element.TargetScrollX = float (TargetScrollX);
+    
+    String TargetScrollY = GetSetting (Properties, "TargetScrollY");
+    if (TargetScrollY != null)
+      Element.TargetScrollY = float (TargetScrollY);
+    
+    String CurrScrollX = GetSetting (Properties, "CurrScrollX");
+    if (CurrScrollX != null)
+      Element.CurrScrollX = float (CurrScrollX);
+    
+    String CurrScrollY = GetSetting (Properties, "CurrScrollY");
+    if (CurrScrollY != null)
+      Element.CurrScrollY = float (CurrScrollY);
+    
+    String ReachTargetSpeed = GetSetting (Properties, "ReachTargetSpeed");
+    if (ReachTargetSpeed != null)
+      Element.ReachTargetSpeed = float (ReachTargetSpeed);
     
     
     

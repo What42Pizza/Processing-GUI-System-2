@@ -14,6 +14,10 @@ void keyPressed() {
   if (key == 27) key = 0;
 }
 
+void mouseWheel (MouseEvent E) {
+  GUIFunctions.mouseWheel(E);
+}
+
 
 
 
@@ -204,6 +208,30 @@ GUI_Element ExitButton = new GUI_Element (new String[] {
 
 
 
+GUI_Element ScrollingFrame = new GUI_Element (new String[] {
+  "ElementType:", "ScrollingFrame",
+  "Name:", "ScrollingFrame",
+  "XPos:" , "0.21",
+  "YPos:" , "0.11",
+  "XSize:", "0.03",
+  "YSize:", "0.8",
+  "BackgroundColor:", "BF", // color (191)
+  //"RenderChildrenNotInFrame:", "false",
+});
+
+GUI_Element ScrollingFrameChild = new GUI_Element (new String[] {
+  "ElementTpye:", "Frame",
+  "Name:", "ScrollingFrameChild",
+  "XPos:" , "0",
+  "YPos:" , "0",
+  "XSize:", "1",
+  "YSize:", "0.2",
+});
+
+
+
+
+
 
 
 
@@ -233,6 +261,9 @@ void setup() {
   AllFrames.AddChild (ImageButtonFrame);
   
   AllFrames.AddChild (ExitButton);
+  
+  AllFrames.AddChild (ScrollingFrame);
+    ScrollingFrame.AddChild (ScrollingFrameChild);
   
   AllFrames.AddChild (NestedFrame1);
     NestedFrame1.AddChild (NestedFrame2);

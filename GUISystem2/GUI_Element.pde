@@ -9,7 +9,7 @@ public class GUI_Element {
   public boolean HasFrame     = true ;
   public boolean HasText      = false;
   public boolean HasImage     = false;
-  public boolean CanBePressed = false;
+  public boolean CanBePressed = false; // If this is set to false outside init then Pressed should also be set to false
   
   public float XPos = 0.25;
   public float YPos = 0.25;
@@ -35,7 +35,7 @@ public class GUI_Element {
   public int     TextAlignX = 0;
   public int     TextAlignY = 0;
   
-  public boolean TextIsEditable  = false;
+  public boolean TextIsEditable  = false; // If this is set to false outside init then TextIsBeingEdited should also be set to false
   public boolean TextResetsOnEdit = true;
   public boolean TextIsBeingEdited = false;
   public boolean PrevTextIsBeingEdited = false;
@@ -50,6 +50,15 @@ public class GUI_Element {
   public float   PressedYMove = 1;
   public boolean Pressed = false;
   public boolean PrevPressed = false;
+  
+  public boolean CanScroll = false;
+  public float   ScrollSpeedX = 0;
+  public float   ScrollSpeedY = 1;
+  public float   TargetScrollX = 0;
+  public float   TargetScrollY = 0;
+  public float   CurrScrollX = 0;
+  public float   CurrScrollY = 0;
+  public float   ReachTargetSpeed = 0.4;
   
   public ArrayList <GUI_Element> Children = new ArrayList <GUI_Element> ();
   public GUI_Element Parent = null;
@@ -180,6 +189,15 @@ public class GUI_Element {
         break;
       
       
+      case ("ScrollingFrame"):
+        HasFrame     = true ;
+        HasText      = false;
+        HasImage     = false;
+        CanBePressed = false;
+        CanScroll    = true ;
+        break;
+      
+      
       case ("Button"):
         HasFrame     = true ;
         HasImage     = false;
@@ -233,8 +251,12 @@ public class GUI_Element {
     
     Update();
     
-    if (Visible && Enabled)
-      RenderBody();
+    if (Visible && Enabled) {
+      CalcScreenData();
+      RenderFrame();
+      RenderImage();
+      RenderText();
+    }
     
     if (Enabled)
       RenderChildren();
@@ -249,8 +271,10 @@ public class GUI_Element {
   
   public void Update() {
     
-    if (Parent == null)
-      GUIFunctions.GetNewKeyPresses(); // Just update keys (if this is a top ancestor) because not updating them can have bad effects on text editing
+    if (Parent == null) {
+      GUIFunctions.GetNewKeyPresses(); // Just update keys and scroll (if this is a top ancestor) because not updating them can have bad effects when they are finally called
+      GUIFunctions.GetScrollAmount();
+    }
     
     if (Draggable)
       UpdateDragging();
@@ -260,6 +284,8 @@ public class GUI_Element {
     
     if (TextIsEditable)
       UpdateTextEditing();
+    
+    UpdateScrolling();
     
   }
   
@@ -340,12 +366,35 @@ public class GUI_Element {
   
   
   
+  public void UpdateScrolling() {
+    
+    if (CanScroll && HasMouseHovering()) {
+      
+      float MouseScrollAmount = GUIFunctions.GetScrollAmount(); // Get amount scrolled
+      if (MouseScrollAmount != 0) {
+        
+        float TotalScreenPercentX = (float) ScreenXSize / width ; // Get screen size because smaller frames need more scroll added to ScrollAmount
+        float TotalScreenPercentY = (float) ScreenYSize / height;
+        
+        float ScrollAmountX = (float) 1/TotalScreenPercentX * ScrollSpeedX / 100 * MouseScrollAmount; // Determin amount of scrolling needed
+        float ScrollAmountY = (float) 1/TotalScreenPercentY * ScrollSpeedY / 100 * MouseScrollAmount; // 1/TotalScPer is because a frame of 1/3 size of screen needs 3x more scrolling. * ScrollSpeed is to make it faster. / 100 is to slow it down because normally it's way too much. * MouseScrollAmount is to make it react to the actual amount of scrolling.
+        
+        TargetScrollX += ScrollAmountX; // Add scrolling
+        TargetScrollY += ScrollAmountY;
+        
+      }
+    }
+    
+    CurrScrollX += (TargetScrollX - CurrScrollX) * ReachTargetSpeed;
+    CurrScrollY += (TargetScrollY - CurrScrollY) * ReachTargetSpeed;
+    
+  }
   
   
-  public void RenderBody() {
-    
-    CalcScreenData();
-    
+  
+  
+  
+  public void RenderFrame() {
     
     if (HasFrame) {
       stroke (EdgeColor);
@@ -359,6 +408,25 @@ public class GUI_Element {
       }
     }
     
+  }
+  
+  
+  
+  public void RenderImage() {
+    
+    if (HasImage && Image != null) {
+      if (Pressed) {
+        image (Image, ScreenPressedXPos, ScreenPressedYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
+      } else {
+        image (Image, ScreenXPos, ScreenYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
+      }
+    }
+    
+  }
+  
+  
+  
+  public void RenderText() {
     
     if (HasText) {
       GUIFunctions.SetTextAlign (TextAlignX, TextAlignY); // Runs textAlign() with correct values
@@ -377,29 +445,29 @@ public class GUI_Element {
       }
     }
     
-    
-    if (HasImage && Image != null) {
-      if (Pressed) {
-        image (Image, ScreenPressedXPos, ScreenPressedYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
-      } else {
-        image (Image, ScreenXPos, ScreenYPos, ScreenXSize * ImageXSize, ScreenYSize * ImageYSize);
-      }
-    }
-    
-    
   }
   
   
   
   public void CalcScreenData() {
-      ScreenXPos  = GUIFunctions.GetScreenX (XPos);
-  int ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
-      ScreenXSize = ScreenXEnd - ScreenXPos;
-      ScreenYPos  = GUIFunctions.GetScreenY (YPos);
-  int ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
-      ScreenYSize = ScreenYEnd - ScreenYPos;
-      ScreenPressedXPos = ScreenXPos + GUIFunctions.GetScreenX (PressedXMove / 300);
-      ScreenPressedYPos = ScreenYPos + GUIFunctions.GetScreenY (PressedYMove / 300);
+    
+    float ParentScrollX = 0, ParentScrollY = 0;
+    if (Parent != null) {
+      ParentScrollX = Parent.CurrScrollX;
+      ParentScrollY = Parent.CurrScrollY;
+    }
+    
+    int ScreenXEnd, ScreenYEnd;
+    ScreenXPos  = GUIFunctions.GetScreenX (ParentScrollX + XPos);
+    ScreenXEnd  = GUIFunctions.GetScreenX (ParentScrollX + XPos + XSize);
+    ScreenXSize = ScreenXEnd - ScreenXPos;
+    ScreenYPos  = GUIFunctions.GetScreenY (ParentScrollY + YPos);
+    ScreenYEnd  = GUIFunctions.GetScreenY (ParentScrollY + YPos + YSize);
+    ScreenYSize = ScreenYEnd - ScreenYPos;
+    
+    ScreenPressedXPos = ScreenXPos + GUIFunctions.GetScreenX (PressedXMove / 300);
+    ScreenPressedYPos = ScreenYPos + GUIFunctions.GetScreenY (PressedYMove / 300);
+    
   }
   
   
@@ -629,7 +697,21 @@ public class GUI_Element {
   
   
   public boolean IsInFrame() {
-    return XPos < 1 && XPos + XSize > 0 && YPos < 1 && YPos + YSize > 0;
+    
+    if (Parent == null) {
+      return XPos < 1 &&
+             XPos + XSize > 0 &&
+             YPos < 1 &&
+             YPos + YSize > 0;
+      
+    } else {
+      float PScrollX = Parent.CurrScrollX, PScrollY = Parent.CurrScrollY;
+      return PScrollX + XPos < 1 &&
+             PScrollX + XPos + XSize > 0 &&
+             PScrollY + YPos < 1 &&
+             PScrollY + YPos + YSize > 0;
+      
+    }
   }
   
   
