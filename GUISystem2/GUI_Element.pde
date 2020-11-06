@@ -106,25 +106,20 @@ public class GUI_Element {
   }
   
   public GUI_Element (String NameIn, File ElementFolder) {
-    
+    this (ElementFolder);
     Name = NameIn;
-    String[] Properties = GUIFunctions.GetPropertiesFromFolder (ElementFolder);
-    GUIFunctions.SetGUIElementProperties (this, Properties);
-    
-    File[] FolderDir = ElementFolder.listFiles();
-    
-    for (File F : FolderDir) {
-      String FName = F.getName();
-      if (FName.startsWith("Child.") && F.isDirectory()) { // Yes, String has .startsWith()
-        AddChild (new GUI_Element (F));
-      }
-    }
-    
   }
   
   public GUI_Element (File ElementFolder) {
     
-    String[] Properties = GUIFunctions.GetPropertiesFromFolder (ElementFolder);
+    if (ElementFolder == null       ) {println ("Error while constructing GUI_Element: The given File cannot be null"); return;}
+    if (!ElementFolder.exists()     ) {println ("Error while constructing GUI_Element: The given File (" + ElementFolder.getAbsolutePath() + ") must exist"); return;}
+    if (!ElementFolder.isDirectory()) {println ("Error while constructing GUI_Element: The given File (" + ElementFolder.getAbsolutePath() + ") must be a folder"); return;}
+    
+    File PropertiesFile = GUIFunctions.GetChildFile (ElementFolder, "Properties.txt");
+    if (PropertiesFile == null) {println ("Error while constructing GUI_Element: No Properties.txt file found in " + ElementFolder.getAbsolutePath()); return;}
+    
+    String[] Properties = loadStrings (PropertiesFile);
     GUIFunctions.SetGUIElementProperties (this, Properties);
     
     File[] FolderDir = ElementFolder.listFiles();
@@ -585,6 +580,7 @@ public class GUI_Element {
     for (GUI_Element E : Children) {
       E.AddAllDescendants (OutputIn);
     }
+    // No retrun because it modifies the input array
   }
   
   
@@ -667,11 +663,14 @@ public class GUI_Element {
   
   
   public boolean HasMouseHovering() {
+    /*
     int ScreenXStart = GUIFunctions.GetScreenX (XPos        );
     int ScreenXEnd   = GUIFunctions.GetScreenX (XPos + XSize);
     int ScreenYStart = GUIFunctions.GetScreenY (YPos        );
     int ScreenYEnd   = GUIFunctions.GetScreenY (YPos + YSize);
     return mouseX >= ScreenXStart && mouseX <= ScreenXEnd && mouseY >= ScreenYStart && mouseY <= ScreenYEnd;
+    */
+    return mouseX > ScreenXPos && mouseX < ScreenXPos + ScreenXSize && mouseY > ScreenYPos && mouseY < ScreenYPos + ScreenYSize;
   }
   
   

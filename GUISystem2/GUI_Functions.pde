@@ -318,31 +318,6 @@ public class GUI_Functions {
   
   
   
-  public String[] GetPropertiesFromFolder (File FolderIn) {
-    
-    if (FolderIn == null || !FolderIn.exists()) {
-      println ("Error: The File given for constructing a GUI element cannot be null or non-existent.");
-      return new String[]{};
-    }
-    
-    if (!FolderIn.isDirectory()) {
-      println ("Error: The File given for constructing a GUI element (" + FolderIn.getAbsolutePath() + ") cannot be file, it must be a folder.");
-      return new String[]{};
-    }
-    
-    File PropertiesFile = GetChildFile (FolderIn, "Properties.txt");
-    
-    if (PropertiesFile == null) {
-      println ("Error: Could not find Properties.txt in " + FolderIn.getAbsolutePath() + " while constructing GUI element.");
-      return new String[]{};
-    }
-    
-    return loadStrings (PropertiesFile);
-    
-  }
-  
-  
-  
   public File GetChildFile (File Folder, String ChildName) {
     File Output = null;
     for (File F : Folder.listFiles()) {
