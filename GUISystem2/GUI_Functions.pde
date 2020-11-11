@@ -126,8 +126,7 @@ public class GUI_Functions {
   
   public boolean KeyPressed (int Key) {
     for (Character C : NewKeyPresses) {
-      if (C == Key)
-        return true;
+      if (C == Key) return true;
     }
     return false;
   }
@@ -234,15 +233,23 @@ public class GUI_Functions {
   
   
   
-  public void SetTextSize (float TextSize, String TextSizeIsRelativeTo, float FrameXPos, float FrameXSize) {
+  public void SetTextSize (String TextToDisplay, float TextSize, String TextSizeIsRelativeTo, boolean TextSizeScales, int ScreenXSize, int ScreenYSize) {
     switch (TextSizeIsRelativeTo) {
       
       case ("FRAME"):
-        textSize (GetScreenXSize (FrameXPos, FrameXSize) * TextSize / 10);
+        if (TextSizeScales) {
+          SetTextSize (TextToDisplay, ScreenXSize * TextSize, ScreenYSize);
+        } else {
+          textSize (ScreenXSize * TextSize / 10);
+        }
         return;
       
       case ("SCREEN"):
-        textSize (width * TextSize / 100);
+        if (TextSizeScales) {
+          SetTextSize (TextToDisplay, width * TextSize, ScreenYSize);
+        } else {
+          textSize (width * TextSize / 100);
+        }
         return;
       
       default:
@@ -250,6 +257,18 @@ public class GUI_Functions {
         return;
       
     }
+  }
+  
+  
+  
+  public void SetTextSize (String TextToDisplay, float TextWidth, int MaxSize) {
+    
+    final float Scale = 100;
+    textSize (Scale);
+    float TextWidth100 = textWidth (TextToDisplay);
+    
+    textSize (min (MaxSize, TextWidth / (TextWidth100 / Scale))); // TextWidth100 / Scale gives what the width would be for textSize of 1 (lets just say this would be 20 pixels), so if you wanted it to be, lets say, 30 pixels, you would do 30 / 20 to give you the textSize of 1.5
+    
   }
   
   
@@ -448,6 +467,14 @@ public class GUI_Functions {
     String TextSizeIsRelativeTo = GetSetting (Properties, "TextSizeIsRelativeTo");
     if (TextSizeIsRelativeTo != null)
       Element.TextSizeIsRelativeTo = TextSizeIsRelativeTo;
+    
+    String TextSizeScales = GetSetting (Properties, "TextSizeScales");
+    if (TextSizeScales != null)
+      Element.TextSizeScales = boolean (TextSizeScales);
+    
+    String TextMaxHeight = GetSetting (Properties, "TextMaxHeight");
+    if (TextMaxHeight != null)
+      Element.TextMaxHeight = float (TextMaxHeight);
     
     String TextAlignX = GetSetting (Properties, "TextAlignX");
     if (TextAlignX != null)

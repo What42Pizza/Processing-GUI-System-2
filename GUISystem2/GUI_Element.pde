@@ -30,8 +30,10 @@ public class GUI_Element {
   public String  PlaceholderText = "Click to enter text";
   public boolean UsePlaceholderText = true;
   public color   TextColor = color (0);
-  public float   TextSize = 1;
+  public float   TextSize = 0.9;
   public String  TextSizeIsRelativeTo = "FRAME"; // This has to be either "FRAME" or "SCREEN"
+  public boolean TextSizeScales = true;
+  public float   TextMaxHeight = 0.8;
   public int     TextAlignX = 0;
   public int     TextAlignY = 0;
   
@@ -424,20 +426,17 @@ public class GUI_Element {
   public void RenderText() {
     
     if (HasText) {
+      String TextToDisplay = Text;
+      if (TextIsBeingEdited) TextToDisplay += (millis() % 1000 > 500 ? "|" : " ");
       GUIFunctions.SetTextAlign (TextAlignX, TextAlignY); // Runs textAlign() with correct values
-      GUIFunctions.SetTextSize (TextSize, TextSizeIsRelativeTo, XPos, XSize); // Runs textSize() with correct values
+      GUIFunctions.SetTextSize (TextToDisplay, TextSize, TextSizeIsRelativeTo, TextSizeScales, ScreenXSize, (int) (ScreenYSize * TextMaxHeight)); // Runs textSize() with correct values
       float TextXPos = XPos + XSize / 2 * (TextAlignX + 1);
       float TextYPos = YPos + YSize / 2 * (TextAlignY + 1);
       if (Pressed) {
         TextXPos += PressedXMove / 300;
         TextYPos += PressedYMove / 300;
       }
-      if (TextIsBeingEdited) {
-        String TextToDisplay = Text + (millis() % 1000 > 500 ? "|" : " ");
-        GUIFunctions.Text (TextToDisplay, TextXPos, TextYPos, TextColor);
-      } else {
-        GUIFunctions.Text (Text, TextXPos, TextYPos, TextColor);
-      }
+      GUIFunctions.Text (TextToDisplay, TextXPos, TextYPos, TextColor);
     }
     
   }

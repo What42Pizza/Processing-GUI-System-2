@@ -17,8 +17,6 @@ Text:
 I loaded from a file!
 TextAlignY:
 -1
-TextSize:
-0.9
 
 Enabled:
 true

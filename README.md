@@ -95,8 +95,10 @@ void mouseWheel (MouseEvent E) {
 - String PlaceholderText (default: "Click to edit text")
 - boolean UsePlaceholderText (default: true)
 - color TextColor (default: color (0))
-- float TextSize (default: 1)
+- float TextSize (default: 0.9)
 - String TextSizeIsRelativeTo (default: "FRAME", has to be either "FRAME" or "SCREEN")
+- boolean TextSizeScales (default: true)
+- float TextMaxHeight (default: 0.8)
 - int TextAlignX (default: 0, 1 = RIGHT, 0 = CENTER, -1 = LEFT)
 - int TextAlignY (default: 0, 1 = BOTTOM, 0 = CENTER, -1 = TOP)
 
@@ -378,4 +380,4 @@ Here's an example of how you would set up a GUI that loads GUI/StartingFrame:
 <br />
 <br />
 
-Last updated 10/13/20
+Last updated 11/11/20

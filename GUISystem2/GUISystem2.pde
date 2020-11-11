@@ -1,5 +1,5 @@
 // Started 10/05/20
-// Last updated 11/06/20
+// Last updated 11/11/20
 
 
 
@@ -53,7 +53,7 @@ GUI_Element NestedFrame1 = new GUI_Element (new String[] {
   "Draggable:", "true",
   "Text:", "Drag me!",
   "TextAlignY:", "-1",
-  "TextSize:", "0.75",
+  "TextSize:", "0.5",
 });
 
 GUI_Element NestedFrame2 = new GUI_Element (new String[] {
@@ -118,6 +118,7 @@ GUI_Element VisibleFrame = new GUI_Element (new String[] {
   "XSize:", "0.1" ,
   "YSize:", "0.1" ,
   "Text:" , "Visible",
+  "TextSize:", "0.4",
   "TextAlignY:", "-1",
 });
 
@@ -135,6 +136,7 @@ GUI_Element EnableFrame = new GUI_Element (new String[] {
   "XSize:", "0.1" ,
   "YSize:", "0.1" ,
   "Text:" , "Enable",
+  "TextSize:", "0.4",
   "TextAlignY:", "-1",
 });
 
@@ -152,7 +154,6 @@ GUI_Element ButtonFrame = new GUI_Element (new String[] {
   "XSize:", "0.1" ,
   "YSize:", "0.1" ,
   "Text:" , "Click me!",
-  "TextSize:", "1.25",
 });
 
 
@@ -169,7 +170,6 @@ GUI_Element TextBox = new GUI_Element (new String[] {
   "ElementType:", "TextBox",
   "Name:" , "TextBox",
   "Text:", "Click this to edit the text!",
-  "TextSize:", "0.75",
   "XPos:" , "0.1" ,
   "YPos:" , "0.66",
   "XSize:", "0.1 ",
@@ -201,7 +201,7 @@ GUI_Element ExitButton = new GUI_Element (new String[] {
   "XSize:", "0.15",
   "YSize:", "0.15",
   "Text:", "Exit",
-  "TextSize:", "2",
+  "TextSize:", "0.75",
 });
 
 
