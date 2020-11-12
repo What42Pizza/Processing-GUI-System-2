@@ -101,6 +101,8 @@ void mouseWheel (MouseEvent E) {
 - float TextMaxHeight (default: 0.8)
 - int TextAlignX (default: 0, 1 = RIGHT, 0 = CENTER, -1 = LEFT)
 - int TextAlignY (default: 0, 1 = BOTTOM, 0 = CENTER, -1 = TOP)
+- float TextXMove (default: 0, relative to text size (not TextSize))
+- float TextYMove (default: -0.1, relative to text size (not TextSize))
 
 <br />
 
@@ -380,4 +382,4 @@ Here's an example of how you would set up a GUI that loads GUI/StartingFrame:
 <br />
 <br />
 
-Last updated 11/11/20
+Last updated 11/12/20

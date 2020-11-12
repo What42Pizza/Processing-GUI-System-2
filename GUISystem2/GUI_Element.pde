@@ -36,6 +36,8 @@ public class GUI_Element {
   public float   TextMaxHeight = 0.8;
   public int     TextAlignX = 0;
   public int     TextAlignY = 0;
+  public float   TextMoveX = 0;
+  public float   TextMoveY = -0.1;
   
   public boolean TextIsEditable  = false; // If this is set to false outside init then TextIsBeingEdited should also be set to false
   public boolean TextResetsOnEdit = true;
@@ -394,8 +396,12 @@ public class GUI_Element {
   public void RenderFrame() {
     
     if (HasFrame) {
-      stroke (EdgeColor);
-      strokeWeight (EdgeSize);
+      if (EdgeSize == 0) {
+        noStroke();
+      } else {
+        stroke (EdgeColor);
+        strokeWeight (EdgeSize);
+      }
       if (Pressed) {
         fill (PressedBackgroundColor);
         rect (ScreenPressedXPos, ScreenPressedYPos, ScreenXSize, ScreenYSize);
@@ -436,7 +442,10 @@ public class GUI_Element {
         TextXPos += PressedXMove / 300;
         TextYPos += PressedYMove / 300;
       }
-      GUIFunctions.Text (TextToDisplay, TextXPos, TextYPos, TextColor);
+      int TextScreenX = GUIFunctions.GetScreenX (TextXPos) + (int) (g.textSize * TextMoveX);
+      int TextScreenY = GUIFunctions.GetScreenY (TextYPos) + (int) (g.textSize * TextMoveY);
+      fill (TextColor);
+      text (TextToDisplay, TextScreenX, TextScreenY);
     }
     
   }

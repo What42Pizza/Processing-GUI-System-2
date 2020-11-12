@@ -189,9 +189,8 @@ public class GUI_Functions {
   
   
   
-  public void Text (String Text, float TextXPos, float TextYPos, color TextColor) { //, float TextSize, String TextSizeIsRelativeTo, float XPos, float XSize) {
+  public void Text (String Text, float TextXPos, float TextYPos) { //, float TextSize, String TextSizeIsRelativeTo, float XPos, float XSize) {
     
-    fill (TextColor);
     text (Text, GetScreenX (TextXPos), GetScreenY (TextYPos));
     
   }
@@ -483,6 +482,14 @@ public class GUI_Functions {
     String TextAlignY = GetSetting (Properties, "TextAlignY");
     if (TextAlignY != null)
       Element.TextAlignY = int (TextAlignY);
+    
+    String TextMoveX = GetSetting (Properties, "TextMoveX");
+    if (TextMoveX != null)
+      Element.TextMoveX = float (TextMoveX);
+    
+    String TextMoveY = GetSetting (Properties, "TextMoveY");
+    if (TextMoveY != null)
+      Element.TextMoveY = float (TextMoveY);
     
     
     
