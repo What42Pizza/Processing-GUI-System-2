@@ -50,8 +50,8 @@ public class GUI_Element {
   
   public color   PressedBackgroundColor = color (79);
   public boolean UsePressedColor = true;
-  public float   PressedXMove = 0;
-  public float   PressedYMove = 1;
+  public int     PressedXMove = 0;
+  public int     PressedYMove = 3;
   public boolean Pressed = false;
   public boolean PrevPressed = false;
   
@@ -249,9 +249,9 @@ public class GUI_Element {
   public void Render() {
     
     Update();
+    CalcScreenData();
     
     if (Visible && Enabled) {
-      CalcScreenData();
       RenderFrame();
       RenderImage();
       RenderText();
@@ -438,12 +438,12 @@ public class GUI_Element {
       GUIFunctions.SetTextSize (TextToDisplay, TextSize, TextSizeIsRelativeTo, TextSizeScales, ScreenXSize, (int) (ScreenYSize * TextMaxHeight)); // Runs textSize() with correct values
       float TextXPos = XPos + XSize / 2 * (TextAlignX + 1);
       float TextYPos = YPos + YSize / 2 * (TextAlignY + 1);
-      if (Pressed) {
-        TextXPos += PressedXMove / 300;
-        TextYPos += PressedYMove / 300;
-      }
       int TextScreenX = GUIFunctions.GetScreenX (TextXPos) + (int) (g.textSize * TextMoveX);
       int TextScreenY = GUIFunctions.GetScreenY (TextYPos) + (int) (g.textSize * TextMoveY);
+      if (Pressed) {
+        TextScreenX += PressedXMove;
+        TextScreenY += PressedYMove;
+      }
       fill (TextColor);
       text (TextToDisplay, TextScreenX, TextScreenY);
     }
@@ -468,8 +468,8 @@ public class GUI_Element {
     ScreenYEnd  = GUIFunctions.GetScreenY (ParentScrollY + YPos + YSize);
     ScreenYSize = ScreenYEnd - ScreenYPos;
     
-    ScreenPressedXPos = ScreenXPos + GUIFunctions.GetScreenX (PressedXMove / 300);
-    ScreenPressedYPos = ScreenYPos + GUIFunctions.GetScreenY (PressedYMove / 300);
+    ScreenPressedXPos = ScreenXPos + PressedXMove;
+    ScreenPressedYPos = ScreenYPos + PressedYMove;
     
   }
   
@@ -678,7 +678,7 @@ public class GUI_Element {
     int ScreenYEnd   = GUIFunctions.GetScreenY (YPos + YSize);
     return mouseX >= ScreenXStart && mouseX <= ScreenXEnd && mouseY >= ScreenYStart && mouseY <= ScreenYEnd;
     */
-    return mouseX > ScreenXPos && mouseX < ScreenXPos + ScreenXSize && mouseY > ScreenYPos && mouseY < ScreenYPos + ScreenYSize;
+    return IsDragging || (mouseX > ScreenXPos && mouseX < ScreenXPos + ScreenXSize && mouseY > ScreenYPos && mouseY < ScreenYPos + ScreenYSize);
   }
   
   

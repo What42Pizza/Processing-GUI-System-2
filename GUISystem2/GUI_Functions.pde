@@ -523,11 +523,11 @@ public class GUI_Functions {
     
     String XMove = GetSetting (Properties, "PressedXMove");
     if (XMove != null)
-      Element.PressedXMove = float (XMove);
+      Element.PressedXMove = int (XMove);
     
     String YMove = GetSetting (Properties, "PressedYMove");
     if (YMove != null)
-      Element.PressedYMove = float (YMove);
+      Element.PressedYMove = int (YMove);
     
     
     
