@@ -121,8 +121,8 @@ void mouseWheel (MouseEvent E) {
 
 - PressedBackgroundColor (default: color (79))
 - boolean UsePressedColor (default: false)
-- float PressedXMove (default: 0)
-- float PressedYMove (default: 1)
+- int PressedXMove (default: 0)
+- int PressedYMove (default: 3)
 - boolean Pressed (read only)
 - boolean PrevPressed (read only)
 
@@ -382,4 +382,4 @@ Here's an example of how you would set up a GUI that loads GUI/StartingFrame:
 <br />
 <br />
 
-Last updated 11/12/20
+Last updated 11/13/20
