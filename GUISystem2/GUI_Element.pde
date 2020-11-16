@@ -54,6 +54,7 @@ public class GUI_Element {
   public int     PressedYMove = 3;
   public boolean Pressed = false;
   public boolean PrevPressed = false;
+  public String  ButtonAction = "None";
   
   public boolean CanScroll = false;
   public float   ScrollSpeedX = 0;
@@ -67,6 +68,7 @@ public class GUI_Element {
   public ArrayList <GUI_Element> Children = new ArrayList <GUI_Element> ();
   public GUI_Element Parent = null;
   public int FamilyLevel = 0;
+  public String FullName = "";
   
   public boolean IsDragging = false;
   public boolean PrevMousePressed = false;
@@ -93,25 +95,35 @@ public class GUI_Element {
   
   public GUI_Element (String NameIn) {
     Name = NameIn;
+    FullName = NameIn;
+    GUIFunctions.AllGUIElements.add(this);
   }
   
   public GUI_Element (String ElementTypeIn, String NameIn) {
     SetBasicType (ElementTypeIn);
     Name = NameIn;
+    FullName = NameIn;
+    GUIFunctions.AllGUIElements.add(this);
   }
   
   public GUI_Element (String NameIn, String[] PropertiesIn) {
     Name = NameIn;
+    FullName = NameIn;
     GUIFunctions.SetGUIElementProperties (this, PropertiesIn);
+    GUIFunctions.AllGUIElements.add(this);
   }
   
   public GUI_Element (String[] PropertiesIn) {
     GUIFunctions.SetGUIElementProperties (this, PropertiesIn);
+    FullName = Name;
+    GUIFunctions.AllGUIElements.add(this);
   }
   
   public GUI_Element (String NameIn, File ElementFolder) {
     this (ElementFolder);
     Name = NameIn;
+    FullName = NameIn;
+    GUIFunctions.AllGUIElements.add(this);
   }
   
   public GUI_Element (File ElementFolder) {
@@ -125,6 +137,7 @@ public class GUI_Element {
     
     String[] Properties = loadStrings (PropertiesFile);
     GUIFunctions.SetGUIElementProperties (this, Properties);
+    FullName = Name;
     
     File[] FolderDir = ElementFolder.listFiles();
     
@@ -134,6 +147,8 @@ public class GUI_Element {
         AddChild (new GUI_Element (F));
       }
     }
+    
+    GUIFunctions.AllGUIElements.add(this);
     
   }
   
@@ -269,6 +284,9 @@ public class GUI_Element {
   
   
   public void Update() {
+    
+    if (this.JustClicked() && !ButtonAction.equals("None"))
+      GUIFunctions.ExecuteAction (ButtonAction, this);
     
     if (Parent == null) {
       GUIFunctions.GetNewKeyPresses(); // Just update keys and scroll (if this is a top ancestor) because not updating them can have bad effects when they are finally called
@@ -543,6 +561,7 @@ public class GUI_Element {
     Children.add (NewChild);
     NewChild.Parent = this;
     NewChild.FamilyLevel = FamilyLevel + 1;
+    NewChild.FullName = this.FullName + "." + NewChild.Name;
   }
   
   
@@ -731,7 +750,7 @@ public class GUI_Element {
   
   
   public String toString() {
-    return "GUI_Element " + Name;
+    return "[GUI_Element " + Name + ']';
   }
   
   

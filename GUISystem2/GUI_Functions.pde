@@ -93,6 +93,12 @@ public class GUI_Functions {
   
   
   
+  ArrayList <GUI_Element> AllGUIElements = new ArrayList <GUI_Element> ();
+  
+  
+  
+  
+  
   
   
   
@@ -355,6 +361,127 @@ public class GUI_Functions {
   
   
   
+  public void ExecuteAction (String Action, GUI_Element TriggerElement) {
+    switch (Action.charAt(0)) {
+      
+      
+      
+      case ('N'):
+        break;
+      
+      
+      
+      case ('E'):
+        
+        if (Action.startsWith("Enable ")) {
+          String ElementToEnableName = Action.substring(7);
+          GUI_Element ElementToEnable = GetGUIElement (ElementToEnableName, TriggerElement);
+          if (ElementToEnable != null) {
+            ElementToEnable.Enabled = true;
+          } else {
+            println ("Error in " + TriggerElement + ": tried to enable " + ElementToEnableName + ", but it was null.");
+          }
+        }
+        
+        if (Action.equals("Exit")) exit();
+        
+        break;
+      
+      
+      
+      case ('D'):
+        
+        if (Action.startsWith("Disable ")) {
+          String ElementToEnableName = Action.substring(8);
+          GUI_Element ElementToDisable = GetGUIElement (ElementToEnableName, TriggerElement);
+          if (ElementToDisable != null) {
+            ElementToDisable.Enabled = false;
+          } else {
+            println ("Error in " + TriggerElement + ": tried to disable " + ElementToEnableName + ", but it was null.");
+          }
+        }
+        
+        break;
+      
+      
+      
+      case ('T'):
+        
+        if (Action.startsWith("Toggle ")) {
+          String ElementToEnableName = Action.substring(7);
+          GUI_Element ElementToToggle = GetGUIElement (ElementToEnableName, TriggerElement);
+          if (ElementToToggle != null) {
+            ElementToToggle.Enabled = !ElementToToggle.Enabled;
+          } else {
+            println ("Error in " + TriggerElement + ": tried to toggle " + ElementToEnableName + ", but it was null.");
+          }
+        }
+        
+        break;
+      
+      
+      
+    }
+  }
+  
+  
+  
+  
+  
+  GUI_Element GetGUIElement (String GUIElementName, GUI_Element StartingElement) {
+    if (GUIElementName.startsWith("this.")) {
+      
+      GUI_Element Output = StartingElement;
+      String[] PathTokens = split (GUIElementName.substring(5), '.');
+      
+      for (String ThisToken : PathTokens) {
+        GUI_Element PrevOutput = Output;
+        if (ThisToken.equals("Parent")) {
+          Output = Output.Parent;
+        } else {
+          Output = Output.Child(ThisToken);
+        }
+        if (Output == null) {
+          println ("Error in " + StartingElement + " while trying to find [" + GUIElementName + "]: tried to find [" + ThisToken + "] in " + PrevOutput + ", but got null.");
+          return null;
+        }
+      }
+      
+      return Output;
+      
+    } else if (GUIElementName.startsWith("all.")) {
+      
+      GUIElementName = GUIElementName.substring(4);
+      for (int i = AllGUIElements.size() - 1; i >= 0; i --) {
+        GUI_Element ThisGUIElement = AllGUIElements.get(i);
+        if (ThisGUIElement == null) {
+          AllGUIElements.remove(i);
+          continue;
+        }
+        if (ThisGUIElement.FullName.equals(GUIElementName)) {
+          return ThisGUIElement;
+        }
+      }
+      
+      return null;
+      
+    } else {
+      
+      println ("Error in " + StartingElement + ": tried to find [" + GUIElementName + "], but it doesn't start with " + '"' + "this." + '"' + " or " + '"' + "all" + '"' + ".");
+      return null;
+      
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   public void SetGUIElementProperties (GUI_Element Element, String[] Properties) {
     
     
@@ -528,6 +655,10 @@ public class GUI_Functions {
     String YMove = GetSetting (Properties, "PressedYMove");
     if (YMove != null)
       Element.PressedYMove = int (YMove);
+    
+    String ButtonAction = GetSetting (Properties, "ButtonAction");
+    if (ButtonAction != null)
+      Element.ButtonAction = ButtonAction;
     
     
     

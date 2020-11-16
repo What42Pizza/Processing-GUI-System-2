@@ -125,6 +125,7 @@ void mouseWheel (MouseEvent E) {
 - int PressedYMove (default: 3)
 - boolean Pressed (read only)
 - boolean PrevPressed (read only)
+- String ButtonAction (Default: "None", see bottom of README)
 
 <br />
 
@@ -142,6 +143,7 @@ void mouseWheel (MouseEvent E) {
 - ArrayList <GUI_Element> Children (default: new ArrayList <GUI_Element> ())
 - GUI_Element Parent (default: null)
 - int FamilyLevel (default: 0)
+- String FullName
 
 <br />
 
@@ -376,10 +378,29 @@ Here's an example of how you would set up a GUI that loads GUI/StartingFrame:
 <br />
 <br />
 <br />
+
+## Using ButtonAction
+
+This is describes what happens when this GUI_Element is clicked. It is usually "None", which does nothing. There are currently 4 other options for what you can use:
+
+- Enable [GUI_Element]
+- Disable [GUI_Element]
+- Toggle [GUI_Element]
+- Exit
+
+They all do what you'd expect, so the only thing I need to explain is what to put in [GUI_Element]. It HAS TO start with either "all." or "this.". When it starts will "all.", it is referring to any GUI_Element that has ever been created. After the "all." is the FullName of the GUI_Element. For example, you can have ButtonAction set to "Enable all.StartingFrame.ThisIsANestedFrame".
+
+The other option is "this.", which specifies a relative GUI_Element that is somewhere in the same family. After the "this.", you can chain together as many tokens as you want, separated with a period. These tokens have to be either "Parent" or the name of a child. For example, ThisIsAnotherNestedFrame could have ButtonAction be "Enable this.Parent.Parent.ThisIsANestedFrame", though that's not recommended.
+
+<br />
+<br />
+<br />
+<br />
+<br />
 <br />
 <br />
 <br />
 <br />
 <br />
 
-Last updated 11/13/20
+Last updated 11/16/20
