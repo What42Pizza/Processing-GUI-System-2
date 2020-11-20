@@ -77,6 +77,10 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
+- boolean SizeIsConsistentWith (default: "POSITION", has to be either "POSITION" or "ITSELF")
+
+<br />
+
 - color BackgroundColor (default: color (127))
 - color EdgeColor (default: color (0))
 - int EdgeSize (default: 1)
@@ -395,6 +399,14 @@ The other option is "this.", which specifies a relative GUI_Element that is some
 <br />
 <br />
 <br />
+
+### SizeIsConsistentWith
+
+This was added because text can look weird while the frame is moving. When set to "POSITION", the size might change by 1 or 2 pixels, but there will never be a gap between GUI Elements when there shouldn't be. When this is set to "ITSELF", the size will never change (unless the Size variables change), but there may be a gap between GUI Elements when there shouldn't be.
+
+<br />
+<br />
+<br />
 <br />
 <br />
 <br />
@@ -403,4 +415,4 @@ The other option is "this.", which specifies a relative GUI_Element that is some
 <br />
 <br />
 
-Last updated 11/16/20
+Last updated 11/20/20

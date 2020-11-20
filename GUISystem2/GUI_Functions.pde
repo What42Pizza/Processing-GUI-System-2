@@ -532,6 +532,10 @@ public class GUI_Functions {
     if (YSize != null)
       Element.YSize = float (YSize);
     
+    String SizeIsConsistentWith = GetSetting (Properties, "SizeIsConsistentWith");
+    if (SizeIsConsistentWith != null)
+      Element.SizeIsConsistentWith = SizeIsConsistentWith;
+    
     
     
     String BackgroundColor = GetSetting (Properties, "BackgroundColor");

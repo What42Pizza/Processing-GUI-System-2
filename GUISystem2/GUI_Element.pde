@@ -16,6 +16,8 @@ public class GUI_Element {
   public float XSize = 0.5;
   public float YSize = 0.5;
   
+  public String SizeIsConsistentWith = "POSITION";
+  
   public color BackgroundColor = color (127);
   public color EdgeColor = color (0);
   public int   EdgeSize = 1;
@@ -83,6 +85,8 @@ public class GUI_Element {
   public int ScreenYSize = 0;
   public int ScreenPressedXPos = 0;
   public int ScreenPressedYPos = 0;
+  
+  public boolean Deleted = false;
   
   
   
@@ -262,6 +266,10 @@ public class GUI_Element {
   
   
   public void Render() {
+    if (Deleted) {
+      println ("ERROR: " + this + " HAS BEEN DELETED. REMOVE ALL POINTERS TO THIS OBJECT.");
+      return;
+    }
     
     Update();
     CalcScreenData();
@@ -393,8 +401,8 @@ public class GUI_Element {
         float TotalScreenPercentX = (float) ScreenXSize / width ; // Get screen size because smaller frames need more scroll added to ScrollAmount
         float TotalScreenPercentY = (float) ScreenYSize / height;
         
-        float ScrollAmountX = (float) 1/TotalScreenPercentX * ScrollSpeedX / 100 * MouseScrollAmount; // Determin amount of scrolling needed
-        float ScrollAmountY = (float) 1/TotalScreenPercentY * ScrollSpeedY / 100 * MouseScrollAmount; // 1/TotalScPer is because a frame of 1/3 size of screen needs 3x more scrolling. * ScrollSpeed is to make it faster. / 100 is to slow it down because normally it's way too much. * MouseScrollAmount is to make it react to the actual amount of scrolling.
+        float ScrollAmountX = (float) 1/TotalScreenPercentX * ScrollSpeedX / 75 * MouseScrollAmount; // Determin amount of scrolling needed
+        float ScrollAmountY = (float) 1/TotalScreenPercentY * ScrollSpeedY / 75 * MouseScrollAmount; // 1/TotalScPer is because a frame of 1/3 size of screen needs 3x more scrolling. * ScrollSpeed is to make it faster. / 100 is to slow it down because normally it's way too much. * MouseScrollAmount is to make it react to the actual amount of scrolling.
         
         TargetScrollX += ScrollAmountX; // Add scrolling
         TargetScrollY += ScrollAmountY;
@@ -478,16 +486,40 @@ public class GUI_Element {
       ParentScrollY = Parent.CurrScrollY;
     }
     
-    int ScreenXEnd, ScreenYEnd;
     ScreenXPos  = GUIFunctions.GetScreenX (ParentScrollX + XPos);
-    ScreenXEnd  = GUIFunctions.GetScreenX (ParentScrollX + XPos + XSize);
-    ScreenXSize = ScreenXEnd - ScreenXPos;
     ScreenYPos  = GUIFunctions.GetScreenY (ParentScrollY + YPos);
-    ScreenYEnd  = GUIFunctions.GetScreenY (ParentScrollY + YPos + YSize);
-    ScreenYSize = ScreenYEnd - ScreenYPos;
+    
+    switch (SizeIsConsistentWith) {
+      
+      case ("POSITION"):
+        int ScreenXEnd, ScreenYEnd;
+        ScreenXEnd  = GUIFunctions.GetScreenX (ParentScrollX + XPos + XSize);
+        ScreenXSize = ScreenXEnd - ScreenXPos;
+        ScreenYEnd  = GUIFunctions.GetScreenY (ParentScrollY + YPos + YSize);
+        ScreenYSize = ScreenYEnd - ScreenYPos;
+        break;
+      
+      case ("ITSELF"):
+        ScreenXSize = (int) (XSize * CustMatrix_ScaleX * width);
+        ScreenYSize = (int) (YSize * CustMatrix_ScaleY * height);
+        break;
+      
+      default:
+        println ("Error in " + this + ": SizeIsConsitantWith has to be either " + '"' + "POSITION" + '"' + " or " + '"' + "ITSELF" + '"' + ".");
+        break;
+      
+    }
     
     ScreenPressedXPos = ScreenXPos + PressedXMove;
     ScreenPressedYPos = ScreenYPos + PressedYMove;
+    
+    /*
+    To understand the extra math behind ITSELF, for ScreenX(/Y)Size you can look at GUIFunctions.GetScreenX as f(x), which equals (x * C + D) * E, where C = ScaleX, D = TranslateX, and E = width
+    This means f(a + b) = aCE + bCE + DE, but f(a) + f(b) = aCE + bCE + 2DE
+    If you consider PScrollX + XPos as a, and XSize as b, then what POSITION is calculating is f(a) - f(a + b), which equals aCE + bCE + DE - aCE - DE
+    aCE and DE cancle out, leaving just bCE
+    To calculate this easier (and more consistant), we skip all the extra steps and just calculate bCE.
+    */
     
   }
   
@@ -495,7 +527,11 @@ public class GUI_Element {
   
   public void RenderChildren() {
     PushMatrix();
-    Translate (XPos, YPos);
+    if (Parent != null) {
+      Translate (XPos + Parent.CurrScrollX, YPos + Parent.CurrScrollY);
+    } else {
+      Translate (XPos, YPos);
+    }
     Scale (1 / XSize, 1 / YSize);
     
     /*
@@ -684,6 +720,41 @@ public class GUI_Element {
   
   
   
+  public void Delete() { // Remove all pointers to this and this's(?) children
+    ArrayList <GUI_Element> AllGUIElements = GUIFunctions.AllGUIElements;
+    
+    for (int i = 0; i < AllGUIElements.size(); i ++) { // Remove from GUIFunctions.AllGUIElements
+      GUI_Element E = AllGUIElements.get(i);
+      if (E == this) {
+        AllGUIElements.remove(i); // This is a pointer, so it removes this from GUIFunctions
+        break;
+      }
+    }
+    
+    for (GUI_Element E : Children) { // Have all children delete themselves too
+      E.Delete();
+    }
+    
+    if (Parent != null) {
+      for (int i = 0; i < Parent.Children.size(); i ++) { // Remove this from Parent.Children
+        if (Parent.Children.get(i) == this) {
+          Parent.Children.remove(i);
+          break;
+        }
+      }
+    }
+    
+    Children = null; // Remove last pointers
+    Parent = null;
+    
+    Deleted = true; // Set as deleted in case user holds more pointers
+    
+  }
+  
+  
+  
+  
+  
   
   
   
@@ -697,7 +768,7 @@ public class GUI_Element {
     int ScreenYEnd   = GUIFunctions.GetScreenY (YPos + YSize);
     return mouseX >= ScreenXStart && mouseX <= ScreenXEnd && mouseY >= ScreenYStart && mouseY <= ScreenYEnd;
     */
-    return IsDragging || (mouseX > ScreenXPos && mouseX < ScreenXPos + ScreenXSize && mouseY > ScreenYPos && mouseY < ScreenYPos + ScreenYSize);
+    return Enabled && (IsDragging || (mouseX > ScreenXPos && mouseX < ScreenXPos + ScreenXSize && mouseY > ScreenYPos && mouseY < ScreenYPos + ScreenYSize));
   }
   
   
