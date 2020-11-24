@@ -134,6 +134,7 @@ void mouseWheel (MouseEvent E) {
 <br />
 
 - boolean CanScroll (default: false)
+- boolean InvertedScrolling (default: false)
 - float ScrollSpeedX (default: 0)
 - float ScrollSpeedY (default: 1)
 - float TargetScrollX (default: 0, this is where the children are scrolling to)
@@ -415,4 +416,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 11/20/20
+Last updated 11/24/20

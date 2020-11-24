@@ -27,6 +27,7 @@ public class GUI_Element {
   public boolean Enabled   = true ;
   public boolean RenderChildrenNotInFrame = true;
   public boolean UpdateChildrenNotInFrame = true;
+  public int RenderOrder = 1;
   
   public String  Text = "Error: text not set";
   public String  PlaceholderText = "Click to enter text";
@@ -59,12 +60,17 @@ public class GUI_Element {
   public String  ButtonAction = "None";
   
   public boolean CanScroll = false;
+  public boolean InvertedScrolling = false;
   public float   ScrollSpeedX = 0;
   public float   ScrollSpeedY = 1;
   public float   TargetScrollX = 0;
   public float   TargetScrollY = 0;
   public float   CurrScrollX = 0;
   public float   CurrScrollY = 0;
+  public float   MinScrollX = 0;
+  public float   MinScrollY = 0;
+  public float   MaxScrollX = 1000;
+  public float   MaxScrollY = 1000;
   public float   ReachTargetSpeed = 0.4;
   
   public ArrayList <GUI_Element> Children = new ArrayList <GUI_Element> ();
@@ -395,7 +401,7 @@ public class GUI_Element {
     
     if (CanScroll && HasMouseHovering()) {
       
-      float MouseScrollAmount = GUIFunctions.GetScrollAmount(); // Get amount scrolled
+      float MouseScrollAmount = GUIFunctions.GetScrollAmount() * (InvertedScrolling ? 1 : -1); // Get amount scrolled
       if (MouseScrollAmount != 0) {
         
         float TotalScreenPercentX = (float) ScreenXSize / width ; // Get screen size because smaller frames need more scroll added to ScrollAmount
@@ -407,12 +413,26 @@ public class GUI_Element {
         TargetScrollX += ScrollAmountX; // Add scrolling
         TargetScrollY += ScrollAmountY;
         
+        ConstrainScroll();
+        
       }
     }
     
     CurrScrollX += (TargetScrollX - CurrScrollX) * ReachTargetSpeed;
     CurrScrollY += (TargetScrollY - CurrScrollY) * ReachTargetSpeed;
     
+  }
+  
+  
+  
+  public void ConstrainScroll() {
+    if (InvertedScrolling) {
+      TargetScrollX = constrain(TargetScrollX, MinScrollX, MaxScrollX);
+      TargetScrollY = constrain(TargetScrollY, MinScrollY, MaxScrollY);
+    } else {
+      TargetScrollX = constrain(TargetScrollX, MaxScrollX * -1, MinScrollX);
+      TargetScrollY = constrain(TargetScrollY, MaxScrollY * -1, MinScrollY);
+    }
   }
   
   
@@ -480,22 +500,16 @@ public class GUI_Element {
   
   public void CalcScreenData() {
     
-    float ParentScrollX = 0, ParentScrollY = 0;
-    if (Parent != null) {
-      ParentScrollX = Parent.CurrScrollX;
-      ParentScrollY = Parent.CurrScrollY;
-    }
-    
-    ScreenXPos  = GUIFunctions.GetScreenX (ParentScrollX + XPos);
-    ScreenYPos  = GUIFunctions.GetScreenY (ParentScrollY + YPos);
+    ScreenXPos = GUIFunctions.GetScreenX(XPos);
+    ScreenYPos = GUIFunctions.GetScreenY(YPos);
     
     switch (SizeIsConsistentWith) {
       
       case ("POSITION"):
         int ScreenXEnd, ScreenYEnd;
-        ScreenXEnd  = GUIFunctions.GetScreenX (ParentScrollX + XPos + XSize);
+        ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
         ScreenXSize = ScreenXEnd - ScreenXPos;
-        ScreenYEnd  = GUIFunctions.GetScreenY (ParentScrollY + YPos + YSize);
+        ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
         ScreenYSize = ScreenYEnd - ScreenYPos;
         break;
       
@@ -527,11 +541,7 @@ public class GUI_Element {
   
   public void RenderChildren() {
     PushMatrix();
-    if (Parent != null) {
-      Translate (XPos + Parent.CurrScrollX, YPos + Parent.CurrScrollY);
-    } else {
-      Translate (XPos, YPos);
-    }
+    Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
     Scale (1 / XSize, 1 / YSize);
     
     /*
@@ -589,15 +599,37 @@ public class GUI_Element {
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   public void AddChild (GUI_Element NewChild) {
+    
     if (NewChild == null) {
       println ("Error in " + this + ": You cannot add a null child.");
       return;
     }
-    Children.add (NewChild);
+    
+    boolean Added = false;
+    for (int i = Children.size() - 1; i >= 0; i --) {
+      if (NewChild.RenderOrder >= Children.get(i).RenderOrder) {
+        Children.add(i+1, NewChild);
+        Added = true;
+        break;
+      }
+    }
+    if (!Added) Children.add(0, NewChild);
+    
     NewChild.Parent = this;
     NewChild.FamilyLevel = FamilyLevel + 1;
     NewChild.FullName = this.FullName + "." + NewChild.Name;
+    
   }
   
   
@@ -720,6 +752,11 @@ public class GUI_Element {
   
   
   
+  
+  
+  
+  
+  
   public void Delete() { // Remove all pointers to this and this's(?) children
     ArrayList <GUI_Element> AllGUIElements = GUIFunctions.AllGUIElements;
     
@@ -731,9 +768,7 @@ public class GUI_Element {
       }
     }
     
-    for (GUI_Element E : Children) { // Have all children delete themselves too
-      E.Delete();
-    }
+    DeleteChildren();
     
     if (Parent != null) {
       for (int i = 0; i < Parent.Children.size(); i ++) { // Remove this from Parent.Children
@@ -749,6 +784,47 @@ public class GUI_Element {
     
     Deleted = true; // Set as deleted in case user holds more pointers
     
+  }
+  
+  
+  
+  void DeleteChildren() {
+    ArrayList <GUI_Element> ChildrenCopy = new ArrayList <GUI_Element> ();
+    for (GUI_Element E : Children) {
+      ChildrenCopy.add(E);
+    }
+    for (GUI_Element E : ChildrenCopy) { // Have all children delete themselves too
+      E.Delete();
+    }
+  }
+  
+  
+  
+  
+  
+  void SetRenderOrder (int NewOrder) {
+    RenderOrder = NewOrder;
+    if (Parent != null) {
+      
+      ArrayList <GUI_Element> PChildren = Parent.Children; // Remove from Parent's children
+      for (int i = 0; i < PChildren.size(); i ++) {
+        if (PChildren.get(i) == this) {
+          PChildren.remove(i);
+          break;
+        }
+      }
+      
+      boolean Added = false;
+      for (int i = PChildren.size() - 1; i >= 0; i --) { // Add to Parent's children in correct location
+        if (RenderOrder > PChildren.get(i).RenderOrder) {
+          PChildren.add(i, this);
+          Added = true;
+          break;
+        }
+      }
+      if (!Added) PChildren.add(0, this);
+      
+    }
   }
   
   
@@ -821,7 +897,7 @@ public class GUI_Element {
   
   
   public String toString() {
-    return "[GUI_Element " + Name + ']';
+    return "[GUI_Element " + FullName + ']';
   }
   
   

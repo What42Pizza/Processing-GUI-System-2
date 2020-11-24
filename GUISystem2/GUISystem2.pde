@@ -1,5 +1,5 @@
 // Started 10/05/20
-// Last updated 11/20/20
+// Last updated 11/24/20
 
 
 
@@ -216,6 +216,9 @@ GUI_Element ScrollingFrame = new GUI_Element (new String[] {
   "XSize:", "0.03",
   "YSize:", "0.8",
   "BackgroundColor:", "BF", // color (191)
+  "InvertedScrolling:", "true",
+  "MinScrollY:", "0",
+  "MaxScrollY:", "0.8",
   //"RenderChildrenNotInFrame:", "false",
 });
 
