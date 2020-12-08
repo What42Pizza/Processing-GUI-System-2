@@ -449,7 +449,7 @@ public class GUI_Element {
         strokeWeight (EdgeSize);
       }
       if (Pressed) {
-        fill (PressedBackgroundColor);
+        fill (UsePressedColor? PressedBackgroundColor : BackgroundColor);
         rect (ScreenPressedXPos, ScreenPressedYPos, ScreenXSize, ScreenYSize);
       } else {
         fill (BackgroundColor);
