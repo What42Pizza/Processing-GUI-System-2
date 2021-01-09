@@ -272,6 +272,9 @@ public class GUI_Element {
   
   
   public void Render() {
+    
+    PrevTextIsBeingEdited = TextIsBeingEdited;
+    
     if (Deleted) {
       println ("ERROR: " + this + " HAS BEEN DELETED. REMOVE ALL POINTERS TO THIS OBJECT.");
       return;
@@ -291,7 +294,6 @@ public class GUI_Element {
     
     PrevMousePressed = mousePressed;
     PrevPressed = Pressed;
-    PrevTextIsBeingEdited = TextIsBeingEdited;
     
   }
   
