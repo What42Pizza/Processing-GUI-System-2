@@ -389,7 +389,7 @@ public class GUI_Element {
         if (C > 31 && C < 127)
           Text += C;
         
-        if (C == 8)
+        if (C == 8 && Text.length() > 0)
           Text = Text.substring (0, Text.length() - 1);
         
       }
