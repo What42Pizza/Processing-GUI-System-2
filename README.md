@@ -130,6 +130,7 @@ void mouseWheel (MouseEvent E) {
 - boolean Pressed (read only)
 - boolean PrevPressed (read only)
 - String ButtonAction (Default: "None", see bottom of README)
+- Action CustomAction (Default: null, see bottom of README)
 
 <br />
 
@@ -400,6 +401,29 @@ The other option is "this.", which specifies a relative GUI_Element that is some
 <br />
 <br />
 <br />
+<br />
+<br />
+
+## Using CustomAction
+
+This allows you to add code to run whenever this GUI_Element is clicked. CustomAction is of type Action, which is a class used by GUI System 2 to define custom code. To use the Action class, you must make a class extending it that overrides the method 'public void Run (GUI_Element)''. Here is an example of an easy way to do that:
+
+```
+ExampleButton.CustomAction = new Action() {
+  @Override
+  public void Run (GUI_Element This) {
+    println ("The button has been clicked");
+  }
+}
+```
+
+Now, ExampleButton will print that text whenever it is clicked. Also, the argument 'This' is the button that called the function.
+
+<br />
+<br />
+<br />
+<br />
+<br />
 
 ### SizeIsConsistentWith
 
@@ -416,4 +440,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 11/24/20
+Last updated 01/11/21

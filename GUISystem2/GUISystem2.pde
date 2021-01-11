@@ -1,5 +1,5 @@
 // Started 10/05/20
-// Last updated 11/24/20
+// Last updated 01/11/21
 
 
 
@@ -278,6 +278,12 @@ void setup() {
   
   
   
+  ExitButton.CustomAction = new Action() {@Override public void Run(GUI_Element This) {
+    exit();
+  }};
+  
+  
+  
   println ("All descendants for AllFrames:");
   ArrayList <GUI_Element> Children = AllFrames.AllDescendants();
   for (GUI_Element E : Children) {
@@ -376,9 +382,11 @@ void draw() {
   
   
   
-  if (ExitButton.JustClicked()) {
+  /*
+  if (ExitButton.JustClicked()) { // Replaced by .CustomAction
     exit();
   }
+  */
   
   
   

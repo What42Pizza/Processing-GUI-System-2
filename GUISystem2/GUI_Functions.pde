@@ -87,6 +87,23 @@ void Threaded_LoadImage() { // I don't know if you could have multiple threads o
 
 
 
+class Action {
+  
+  public void Run (GUI_Element ButtonElement) {
+    println ("Error: ButtonAction for " + ButtonElement + " has not been set.");
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+
 public class GUI_Functions {
   
   
@@ -94,6 +111,10 @@ public class GUI_Functions {
   
   
   ArrayList <GUI_Element> AllGUIElements = new ArrayList <GUI_Element> ();
+  
+  
+  
+  boolean EscKeyUsed = false;
   
   
   
@@ -361,8 +382,8 @@ public class GUI_Functions {
   
   
   
-  public void ExecuteAction (String Action, GUI_Element TriggerElement) {
-    switch (Action.charAt(0)) {
+  public void ExecuteAction (String ButtonAction, GUI_Element TriggerElement) {
+    switch (ButtonAction.charAt(0)) {
       
       
       
@@ -373,8 +394,8 @@ public class GUI_Functions {
       
       case ('E'):
         
-        if (Action.startsWith("Enable ")) {
-          String ElementToEnableName = Action.substring(7);
+        if (ButtonAction.startsWith("Enable ")) {
+          String ElementToEnableName = ButtonAction.substring(7);
           GUI_Element ElementToEnable = GetGUIElement (ElementToEnableName, TriggerElement);
           if (ElementToEnable != null) {
             ElementToEnable.Enabled = true;
@@ -383,7 +404,7 @@ public class GUI_Functions {
           }
         }
         
-        if (Action.equals("Exit")) exit();
+        if (ButtonAction.equals("Exit")) exit();
         
         break;
       
@@ -391,8 +412,8 @@ public class GUI_Functions {
       
       case ('D'):
         
-        if (Action.startsWith("Disable ")) {
-          String ElementToEnableName = Action.substring(8);
+        if (ButtonAction.startsWith("Disable ")) {
+          String ElementToEnableName = ButtonAction.substring(8);
           GUI_Element ElementToDisable = GetGUIElement (ElementToEnableName, TriggerElement);
           if (ElementToDisable != null) {
             ElementToDisable.Enabled = false;
@@ -407,8 +428,8 @@ public class GUI_Functions {
       
       case ('T'):
         
-        if (Action.startsWith("Toggle ")) {
-          String ElementToEnableName = Action.substring(7);
+        if (ButtonAction.startsWith("Toggle ")) {
+          String ElementToEnableName = ButtonAction.substring(7);
           GUI_Element ElementToToggle = GetGUIElement (ElementToEnableName, TriggerElement);
           if (ElementToToggle != null) {
             ElementToToggle.Enabled = !ElementToToggle.Enabled;
@@ -418,6 +439,12 @@ public class GUI_Functions {
         }
         
         break;
+      
+      
+      
+      default:
+        
+        println ("Error in " + TriggerElement + ": action type " + '"' + ButtonAction + '"' + " is unknown.");
       
       
       

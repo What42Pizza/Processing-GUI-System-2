@@ -32,6 +32,7 @@ public class GUI_Element {
   public String  Text = "Error: text not set";
   public String  PlaceholderText = "Click to enter text";
   public boolean UsePlaceholderText = true;
+  public boolean TextResetsOnEdit = true;
   public color   TextColor = color (0);
   public float   TextSize = 0.9;
   public String  TextSizeIsRelativeTo = "FRAME"; // This has to be either "FRAME" or "SCREEN"
@@ -43,7 +44,6 @@ public class GUI_Element {
   public float   TextMoveY = -0.1;
   
   public boolean TextIsEditable  = false; // If this is set to false outside init then TextIsBeingEdited should also be set to false
-  public boolean TextResetsOnEdit = true;
   public boolean TextIsBeingEdited = false;
   public boolean PrevTextIsBeingEdited = false;
   
@@ -58,6 +58,7 @@ public class GUI_Element {
   public boolean Pressed = false;
   public boolean PrevPressed = false;
   public String  ButtonAction = "None";
+  public Action  CustomAction = null;
   
   public boolean CanScroll = false;
   public boolean InvertedScrolling = false;
@@ -272,6 +273,9 @@ public class GUI_Element {
   
   
   public void Render() {
+    
+    PrevTextIsBeingEdited = TextIsBeingEdited;
+    
     if (Deleted) {
       println ("ERROR: " + this + " HAS BEEN DELETED. REMOVE ALL POINTERS TO THIS OBJECT.");
       return;
@@ -291,7 +295,6 @@ public class GUI_Element {
     
     PrevMousePressed = mousePressed;
     PrevPressed = Pressed;
-    PrevTextIsBeingEdited = TextIsBeingEdited;
     
   }
   
@@ -299,8 +302,10 @@ public class GUI_Element {
   
   public void Update() {
     
-    if (this.JustClicked() && !ButtonAction.equals("None"))
-      GUIFunctions.ExecuteAction (ButtonAction, this);
+    if (this.JustClicked()) {
+      if (!ButtonAction.equals("None")) GUIFunctions.ExecuteAction (ButtonAction, this);
+      if (CustomAction != null) CustomAction.Run (this);
+    }
     
     if (Parent == null) {
       GUIFunctions.GetNewKeyPresses(); // Just update keys and scroll (if this is a top ancestor) because not updating them can have bad effects when they are finally called
@@ -369,7 +374,10 @@ public class GUI_Element {
   
   public void UpdateTextEditing() {
     
-    if (GUIFunctions.KeyPressed (27) || GUIFunctions.KeyPressed (10) || (mousePressed && !PrevMousePressed && !this.HasMouseHovering())) {
+    boolean EscKeyPressed = GUIFunctions.KeyPressed (27);
+    boolean EnterKeyPressed = GUIFunctions.KeyPressed (10);
+    if (TextIsBeingEdited && (EscKeyPressed || EnterKeyPressed || (mousePressed && !PrevMousePressed && !this.HasMouseHovering()))) {
+      if (EscKeyPressed) GUIFunctions.EscKeyUsed = true;
       TextIsBeingEdited = false;
       if (Text.equals("") && UsePlaceholderText)
         Text = PlaceholderText;
@@ -387,7 +395,7 @@ public class GUI_Element {
         if (C > 31 && C < 127)
           Text += C;
         
-        if (C == 8)
+        if (C == 8 && Text.length() > 0)
           Text = Text.substring (0, Text.length() - 1);
         
       }
