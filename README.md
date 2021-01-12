@@ -22,6 +22,10 @@ void keyPressed() {
   if (key == 27) key = 0;
 }
 
+void keyReleased() { // (optional for now)
+  GUIFunctions.keyReleased();
+}
+
 void mouseWheel (MouseEvent E) {
   GUIFunctions.mouseWheel(E);
 }
@@ -127,10 +131,11 @@ void mouseWheel (MouseEvent E) {
 - boolean UsePressedColor (default: false)
 - int PressedXMove (default: 0)
 - int PressedYMove (default: 3)
-- boolean Pressed (read only)
+- boolean Pressed (read only (but set to false if CanBePressed is set to false))
 - boolean PrevPressed (read only)
 - String ButtonAction (Default: "None", see bottom of README)
 - Action CustomAction (Default: null, see bottom of README)
+- int ButtonKey (default: -1, can also be set in Properties with "ButtonCharacter" followed by a char)
 
 <br />
 
@@ -440,4 +445,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 01/11/21
+Last updated 01/12/21

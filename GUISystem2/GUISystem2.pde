@@ -1,5 +1,5 @@
 // Started 10/05/20
-// Last updated 01/11/21
+// Last updated 01/12/21
 
 
 
@@ -12,6 +12,10 @@ GUI_Functions GUIFunctions = new GUI_Functions(); // YOU NEED TO HAVE THIS AT TH
 void keyPressed() {
   GUIFunctions.keyPressed();
   if (key == 27) key = 0;
+}
+
+void keyReleased() { // (optional for now)
+  GUIFunctions.keyReleased();
 }
 
 void mouseWheel (MouseEvent E) {
@@ -378,7 +382,9 @@ void draw() {
   
   
   VisibleFrame.Visible = !VisibleFrame.HasMouseHovering(); // Make frame not visible when mouse is hovering
-  EnableFrame .Enabled = !EnableFrame .HasMouseHovering(); // Make frame not enabled when mouse is hovering 
+  
+  EnableFrame.Enabled = true; // .HasMouseHovering returns false when enabled is false, so this has to be done to test HasMouseHovering
+  EnableFrame.Enabled = !EnableFrame.HasMouseHovering(); // Make frame not enabled when mouse is hovering 
   
   
   

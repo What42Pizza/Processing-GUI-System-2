@@ -129,8 +129,18 @@ public class GUI_Functions {
   Character[] NewKeyPresses = new Character [0];
   ArrayList <Character> NewKeyPressesBuffer = new ArrayList <Character> ();
   
-  public void keyPressed() { 
+  boolean[] Keys = new boolean [128];
+  boolean[] PrevKeys = new boolean [128];
+  
+  
+  
+  public void keyPressed() {
+    if (key < 128) Keys[key] = true;
     NewKeyPressesBuffer.add (key);
+  }
+  
+  public void keyReleased() {
+    if (key < 128) Keys[key] = false;
   }
   
   
@@ -151,10 +161,17 @@ public class GUI_Functions {
   
   
   
-  public boolean KeyPressed (int Key) {
+  public boolean KeyJustPressed (int Key) {
     for (Character C : NewKeyPresses) {
       if (C == Key) return true;
     }
+    return false;
+  }
+  
+  
+  
+  public boolean KeyIsPressed (int Key) {
+    if (key < 128) return Keys[Key];
     return false;
   }
   
@@ -694,6 +711,14 @@ public class GUI_Functions {
     String ButtonAction = GetSetting (Properties, "ButtonAction");
     if (ButtonAction != null)
       Element.ButtonAction = ButtonAction;
+    
+    String ButtonKey = GetSetting (Properties, "ButtonKey");
+    if (ButtonKey != null)
+      Element.ButtonKey = int (ButtonKey);
+    
+    String ButtonCharacter = GetSetting (Properties, "ButtonCharacter");
+    if (ButtonCharacter != null)
+      Element.ButtonKey = ButtonCharacter.charAt(0);
     
     
     

@@ -27,7 +27,7 @@ public class GUI_Element {
   public boolean Enabled   = true ;
   public boolean RenderChildrenNotInFrame = true;
   public boolean UpdateChildrenNotInFrame = true;
-  public int RenderOrder = 1;
+  public int     RenderOrder = 1;
   
   public String  Text = "Error: text not set";
   public String  PlaceholderText = "Click to enter text";
@@ -59,6 +59,7 @@ public class GUI_Element {
   public boolean PrevPressed = false;
   public String  ButtonAction = "None";
   public Action  CustomAction = null;
+  public int     ButtonKey = -1;
   
   public boolean CanScroll = false;
   public boolean InvertedScrolling = false;
@@ -354,18 +355,16 @@ public class GUI_Element {
   
   
   public void UpdatePressed() {
-    
     if (Pressed) {
-      
-      if (!mousePressed) // Stop being pressed if mouse is released
-        Pressed = false;
+      if (!(ButtonKey != -1 && GUIFunctions.KeyIsPressed (ButtonKey))) { // Don't unpress if ButtonKey is pressed
         
-      if (!this.HasMouseHovering()) // Stop being pressed if mouse is no longer hovering
-        Pressed = false;
-      
+        if (!mousePressed) Pressed = false; // Stop being pressed if mouse is released
+        if (!this.HasMouseHovering()) Pressed = false; // Stop being pressed if mouse is no longer hovering
+        
+      }
     } else {
-      if (this.JustClicked()) // Start being pressed if just not clicked
-        Pressed = true;
+      
+      if (this.JustClicked()) Pressed = true; // Start being pressed if just not clicked
       
     }
   }
@@ -374,8 +373,8 @@ public class GUI_Element {
   
   public void UpdateTextEditing() {
     
-    boolean EscKeyPressed = GUIFunctions.KeyPressed (27);
-    boolean EnterKeyPressed = GUIFunctions.KeyPressed (10);
+    boolean EscKeyPressed = GUIFunctions.KeyJustPressed (27);
+    boolean EnterKeyPressed = GUIFunctions.KeyJustPressed (10);
     if (TextIsBeingEdited && (EscKeyPressed || EnterKeyPressed || (mousePressed && !PrevMousePressed && !this.HasMouseHovering()))) {
       if (EscKeyPressed) GUIFunctions.EscKeyUsed = true;
       TextIsBeingEdited = false;
@@ -858,7 +857,8 @@ public class GUI_Element {
   
   
   public boolean JustClicked() {
-    return mousePressed && !PrevMousePressed && this.HasMouseHovering();
+    if (ButtonKey != -1 && GUIFunctions.KeyJustPressed (ButtonKey)) return true;
+    return (mousePressed && !PrevMousePressed && this.HasMouseHovering());
   }
   
   public boolean JustReleased() {
