@@ -1,5 +1,5 @@
 // Started 10/05/20
-// Last updated 01/12/21
+// Last updated 01/13/21
 
 
 
@@ -282,11 +282,21 @@ void setup() {
   
   
   
-  ExitButton.CustomAction = new Action() {@Override public void Run(GUI_Element This) {
+  ExitButton.OnButtonPressed = new Action() {@Override public void Run (GUI_Element This) {
     exit();
   }};
   
+  ButtonFrame.OnButtonPressed = new Action() {@Override public void Run (GUI_Element This) {
+    println ("you just clicked " + This + "!");
+  }};
   
+  TextBox.OnTextFinished = new Action() {@Override public void Run (GUI_Element This) {
+    println ("you just changed the text to " + '"' + This.Text + '"' + "!");
+  }};
+  
+  
+  
+  println ("Examples of functions:");
   
   println ("All descendants for AllFrames:");
   ArrayList <GUI_Element> Children = AllFrames.AllDescendants();
@@ -313,6 +323,12 @@ void setup() {
   
   println ("Results for NestedFrame2: " + NestedFrame4.Ancestor("NestedFrame2"));
   println ("Results for NestedFrame0: " + NestedFrame4.Ancestor("NestedFrame0"));
+  
+  println();
+  println();
+  println();
+  println();
+  println();
   
   
   

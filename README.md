@@ -81,6 +81,13 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
+- int XPixelOffset (default: 0)
+- int YPixelOffset (default: 0)
+- int XSizePixelOffset (default: 0)
+- int YSizePixelOffset (default: 0)
+
+<br />
+
 - boolean SizeIsConsistentWith (default: "POSITION", has to be either "POSITION" or "ITSELF")
 
 <br />
@@ -118,6 +125,7 @@ void mouseWheel (MouseEvent E) {
 - boolean TextResetsOnEdit (default: true)
 - boolean TextIsBeingEdited (read only)
 - boolean PrevTextIsBeingEdited (read only)
+- Action OnTextFinished (default: null, see bottom of README)
 
 <br />
 
@@ -134,7 +142,7 @@ void mouseWheel (MouseEvent E) {
 - boolean Pressed (read only (but set to false if CanBePressed is set to false))
 - boolean PrevPressed (read only)
 - String ButtonAction (Default: "None", see bottom of README)
-- Action CustomAction (Default: null, see bottom of README)
+- Action OnButtonPressed (Default: null, see bottom of README)
 - int ButtonKey (default: -1, can also be set in Properties with "ButtonCharacter" followed by a char)
 
 <br />
@@ -424,6 +432,8 @@ ExampleButton.CustomAction = new Action() {
 
 Now, ExampleButton will print that text whenever it is clicked. Also, the argument 'This' is the button that called the function.
 
+NOTE: Do not use this to edit the element's family tree. If you do so, you'll probably run into problems with ConcurrentModificationException.
+
 <br />
 <br />
 <br />
@@ -445,4 +455,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 01/12/21
+Last updated 01/13/21

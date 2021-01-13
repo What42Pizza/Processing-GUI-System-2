@@ -404,11 +404,6 @@ public class GUI_Functions {
       
       
       
-      case ('N'):
-        break;
-      
-      
-      
       case ('E'):
         
         if (ButtonAction.startsWith("Enable ")) {
@@ -434,6 +429,7 @@ public class GUI_Functions {
           GUI_Element ElementToDisable = GetGUIElement (ElementToEnableName, TriggerElement);
           if (ElementToDisable != null) {
             ElementToDisable.Enabled = false;
+            ElementToDisable.IsDragging = false;
           } else {
             println ("Error in " + TriggerElement + ": tried to disable " + ElementToEnableName + ", but it was null.");
           }
@@ -450,6 +446,7 @@ public class GUI_Functions {
           GUI_Element ElementToToggle = GetGUIElement (ElementToEnableName, TriggerElement);
           if (ElementToToggle != null) {
             ElementToToggle.Enabled = !ElementToToggle.Enabled;
+            ElementToToggle.IsDragging = false;
           } else {
             println ("Error in " + TriggerElement + ": tried to toggle " + ElementToEnableName + ", but it was null.");
           }
@@ -575,6 +572,26 @@ public class GUI_Functions {
     String YSize = GetSetting (Properties, "YSize");
     if (YSize != null)
       Element.YSize = float (YSize);
+    
+    
+    
+    String XPixelOffset = GetSetting (Properties, "XPixelOffset");
+    if (XPixelOffset != null)
+      Element.XPixelOffset = int (XPixelOffset);
+    
+    String YPixelOffset = GetSetting (Properties, "YPixelOffset");
+    if (YPixelOffset != null)
+      Element.YPixelOffset = int (YPixelOffset);
+    
+    String XSizePixelOffset = GetSetting (Properties, "XSizePixelOffset");
+    if (XSizePixelOffset != null)
+      Element.XSizePixelOffset = int (XSizePixelOffset);
+    
+    String YSizePixelOffset = GetSetting (Properties, "YSizePixelOffset");
+    if (YSizePixelOffset != null)
+      Element.YSizePixelOffset = int (YSizePixelOffset);
+    
+    
     
     String SizeIsConsistentWith = GetSetting (Properties, "SizeIsConsistentWith");
     if (SizeIsConsistentWith != null)

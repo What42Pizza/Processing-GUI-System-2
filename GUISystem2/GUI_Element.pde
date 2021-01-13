@@ -1,4 +1,4 @@
-public class GUI_Element {
+public class GUI_Element implements Cloneable {
   
   
   
@@ -15,6 +15,11 @@ public class GUI_Element {
   public float YPos = 0.25;
   public float XSize = 0.5;
   public float YSize = 0.5;
+  
+  public int XPixelOffset = 0;
+  public int YPixelOffset = 0;
+  public int XSizePixelOffset = 0;
+  public int YSizePixelOffset = 0;
   
   public String SizeIsConsistentWith = "POSITION";
   
@@ -46,6 +51,7 @@ public class GUI_Element {
   public boolean TextIsEditable  = false; // If this is set to false outside init then TextIsBeingEdited should also be set to false
   public boolean TextIsBeingEdited = false;
   public boolean PrevTextIsBeingEdited = false;
+  public Action  OnTextFinished = null;
   
   public PImage Image         ;
   public float  ImageXSize = 1;
@@ -58,7 +64,7 @@ public class GUI_Element {
   public boolean Pressed = false;
   public boolean PrevPressed = false;
   public String  ButtonAction = "None";
-  public Action  CustomAction = null;
+  public Action  OnButtonPressed = null;
   public int     ButtonKey = -1;
   
   public boolean CanScroll = false;
@@ -274,6 +280,8 @@ public class GUI_Element {
   
   
   public void Render() {
+    if (!Enabled) return;
+    //try {
     
     PrevTextIsBeingEdited = TextIsBeingEdited;
     
@@ -283,6 +291,8 @@ public class GUI_Element {
     }
     
     Update();
+    if (Deleted) return; // CustomAction might delete its own caller
+    
     CalcScreenData();
     
     if (Visible && Enabled) {
@@ -297,6 +307,7 @@ public class GUI_Element {
     PrevMousePressed = mousePressed;
     PrevPressed = Pressed;
     
+    //} catch (Exception e) {println (this);}
   }
   
   
@@ -305,7 +316,7 @@ public class GUI_Element {
     
     if (this.JustClicked()) {
       if (!ButtonAction.equals("None")) GUIFunctions.ExecuteAction (ButtonAction, this);
-      if (CustomAction != null) CustomAction.Run (this);
+      if (OnButtonPressed != null) OnButtonPressed.Run (this);
     }
     
     if (Parent == null) {
@@ -321,6 +332,9 @@ public class GUI_Element {
     
     if (TextIsEditable)
       UpdateTextEditing();
+    
+    if (OnTextFinished != null && UserStoppedEditingText())
+      OnTextFinished.Run (this);
     
     UpdateScrolling();
     
@@ -507,22 +521,22 @@ public class GUI_Element {
   
   public void CalcScreenData() {
     
-    ScreenXPos = GUIFunctions.GetScreenX(XPos);
-    ScreenYPos = GUIFunctions.GetScreenY(YPos);
+    ScreenXPos = GUIFunctions.GetScreenX(XPos) + XPixelOffset;
+    ScreenYPos = GUIFunctions.GetScreenY(YPos) + YPixelOffset;
     
     switch (SizeIsConsistentWith) {
       
       case ("POSITION"):
         int ScreenXEnd, ScreenYEnd;
         ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
-        ScreenXSize = ScreenXEnd - ScreenXPos;
+        ScreenXSize = ScreenXEnd - ScreenXPos + XSizePixelOffset;
         ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
-        ScreenYSize = ScreenYEnd - ScreenYPos;
+        ScreenYSize = ScreenYEnd - ScreenYPos + YSizePixelOffset;
         break;
       
       case ("ITSELF"):
-        ScreenXSize = (int) (XSize * CustMatrix_ScaleX * width);
-        ScreenYSize = (int) (YSize * CustMatrix_ScaleY * height);
+        ScreenXSize = (int) (XSize * CustMatrix_ScaleX * width ) + XSizePixelOffset;
+        ScreenYSize = (int) (YSize * CustMatrix_ScaleY * height) + YSizePixelOffset;
         break;
       
       default:
@@ -547,6 +561,7 @@ public class GUI_Element {
   
   
   public void RenderChildren() {
+    
     PushMatrix();
     Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
     Scale (1 / XSize, 1 / YSize);
@@ -568,8 +583,9 @@ public class GUI_Element {
     if (RenderChildrenNotInFrame) { // Always render and update (Render = true, Update = true)
       if (!UpdateChildrenNotInFrame) println ("Warning in " + this + ": UpdateChildrenNotInFrame is treated as true when RenderChildrenNotInFrame is true.");
       
-      for (GUI_Element E : Children) {
-        E.Render();
+      //println (this + " " + Children.size());
+      for (int i = 0; i < Children.size(); i ++) {
+        Children.get(i).Render();
       }
       
     } else {
@@ -906,6 +922,26 @@ public class GUI_Element {
   
   public String toString() {
     return "[GUI_Element " + FullName + ']';
+  }
+  
+  
+  
+  public Object clone() {
+    try {
+      
+      // Shallow clone
+      GUI_Element NewElement;
+      NewElement = (GUI_Element) super.clone();
+      
+      // Deep clone
+      NewElement.Children = new ArrayList <GUI_Element> ();
+      for (GUI_Element Child : Children) {
+        NewElement.AddChild ((GUI_Element) Child.clone());
+      }
+      
+      return NewElement;
+      
+    } catch (CloneNotSupportedException e) {return null;} // Shouldn't happen
   }
   
   
