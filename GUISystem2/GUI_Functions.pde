@@ -697,6 +697,10 @@ public class GUI_Functions {
     if (TextResetsOnEdit != null)
       Element.TextResetsOnEdit = boolean (TextResetsOnEdit);
     
+    String TextResetsIfEqualing = GetSetting (Properties, "TextResetsIfEqualing");
+    if (TextResetsIfEqualing != null)
+      Element.TextResetsIfEqualing = TextResetsIfEqualing;
+    
     
     
     String ImageXSize = GetSetting (Properties, "ImageXSize");

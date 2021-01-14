@@ -178,6 +178,7 @@ GUI_Element TextBox = new GUI_Element (new String[] {
   "YPos:" , "0.66",
   "XSize:", "0.1 ",
   "YSize:", "0.1 ",
+  "TextResetsIfEqualing", "example text",
 });
 
 

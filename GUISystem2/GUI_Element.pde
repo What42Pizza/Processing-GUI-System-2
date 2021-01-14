@@ -38,6 +38,7 @@ public class GUI_Element implements Cloneable {
   public String  PlaceholderText = "Click to enter text";
   public boolean UsePlaceholderText = true;
   public boolean TextResetsOnEdit = true;
+  public String  TextResetsIfEqualing = null;
   public color   TextColor = color (0);
   public float   TextSize = 0.9;
   public String  TextSizeIsRelativeTo = "FRAME"; // This has to be either "FRAME" or "SCREEN"
@@ -398,8 +399,7 @@ public class GUI_Element implements Cloneable {
     
     if (JustClicked()) {
       TextIsBeingEdited = true;
-      if (TextResetsOnEdit)
-        Text = "";
+      if (TextResetsOnEdit || (TextResetsIfEqualing != null && Text.equals(TextResetsIfEqualing))) Text = "";
     }
     
     if (TextIsBeingEdited) {
@@ -529,9 +529,9 @@ public class GUI_Element implements Cloneable {
       case ("POSITION"):
         int ScreenXEnd, ScreenYEnd;
         ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
-        ScreenXSize = ScreenXEnd - ScreenXPos + XSizePixelOffset;
+        ScreenXSize = ScreenXEnd - ScreenXPos + XSizePixelOffset + XPixelOffset;
         ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
-        ScreenYSize = ScreenYEnd - ScreenYPos + YSizePixelOffset;
+        ScreenYSize = ScreenYEnd - ScreenYPos + YSizePixelOffset + YPixelOffset;
         break;
       
       case ("ITSELF"):

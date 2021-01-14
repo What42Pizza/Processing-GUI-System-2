@@ -70,7 +70,7 @@ void mouseWheel (MouseEvent E) {
 - boolean HasFrame (default: true)
 - boolean HasText (default: false)
 - boolean HasImage (default: false)
-- boolean CanBePressed (default: false, if this is set to false outside init, set Pressed to false too)
+- boolean CanBePressed (default: false, NOTE: if this is set to false outside init, set Pressed to false too)
 
 <br />
 
@@ -81,7 +81,7 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
-- int XPixelOffset (default: 0)
+- int XPixelOffset (default: 0, NOTE: this does not affect children)
 - int YPixelOffset (default: 0)
 - int XSizePixelOffset (default: 0)
 - int YSizePixelOffset (default: 0)
@@ -121,11 +121,12 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
-- boolean TextIsEditable (default: false, if this is set to false outside init, set TextIsBeingEdited to false too)
+- boolean TextIsEditable (default: false, NOTE: if this is set to false outside init, set TextIsBeingEdited to false too)
 - boolean TextResetsOnEdit (default: true)
+- String TextResetsIfEqualing (default: null, (only affects when edit starts))
+- Action OnTextFinished (default: null, see bottom of README)
 - boolean TextIsBeingEdited (read only)
 - boolean PrevTextIsBeingEdited (read only)
-- Action OnTextFinished (default: null, see bottom of README)
 
 <br />
 
@@ -139,7 +140,7 @@ void mouseWheel (MouseEvent E) {
 - boolean UsePressedColor (default: false)
 - int PressedXMove (default: 0)
 - int PressedYMove (default: 3)
-- boolean Pressed (read only (but set to false if CanBePressed is set to false))
+- boolean Pressed (read only)
 - boolean PrevPressed (read only)
 - String ButtonAction (Default: "None", see bottom of README)
 - Action OnButtonPressed (Default: null, see bottom of README)
@@ -151,6 +152,13 @@ void mouseWheel (MouseEvent E) {
 - boolean InvertedScrolling (default: false)
 - float ScrollSpeedX (default: 0)
 - float ScrollSpeedY (default: 1)
+- float MinScrollX (default: 0, NOTE: make sure to call ConstrainScroll() after changing any of these)
+- float MinScrollY (default: 0)
+- float MaxScrollX (default: 1000)
+- float MaxScrollY (default: 1000)
+
+<br />
+
 - float TargetScrollX (default: 0, this is where the children are scrolling to)
 - float TargetScrollY (default: 0)
 - float CurrScrollX (default: 0, this is where the children currently are)
@@ -166,12 +174,12 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
-- int ScreenXPos (read only, only updates when rendered)
-- int ScreenYPos (read only, only updates when rendered)
-- int ScreenXSize (read only, only updates when rendered)
-- int ScreenYSize (read only, only updates when rendered)
-- int ScreenPressedXPos (read only, only updates when rendered)
-- int ScreenPressedYPos (read only, only updates when rendered)
+- int ScreenXPos (read only, these only updates when Render() is called)
+- int ScreenYPos (read only)
+- int ScreenXSize (read only)
+- int ScreenYSize (read only)
+- int ScreenPressedXPos (read only)
+- int ScreenPressedYPos (read only)
 
 <br />
 <br />
