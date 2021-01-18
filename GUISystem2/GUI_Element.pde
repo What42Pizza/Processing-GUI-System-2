@@ -291,15 +291,19 @@ public class GUI_Element implements Cloneable {
   
   
   public void RenderWOUpdate() { // Call RenderThis() on this and children
-    RenderThis();
-    RenderChildren();
+    if (Enabled) {
+      RenderThis();
+      RenderChildren(); // Calls RenderWOUpdate(), not Render()
+    }
   }
   
   
   
   public void Update() { // Call UpdateThis() on this and children
-    UpdateThis();
-    UpdateChildren();
+    if (Enabled) {
+      UpdateThis();
+      UpdateChildren();
+    }
   }
   
   
