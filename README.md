@@ -156,6 +156,7 @@ void mouseWheel (MouseEvent E) {
 - float MinScrollY (default: 0)
 - float MaxScrollX (default: 1000)
 - float MaxScrollY (default: 1000)
+- GUI_Element[] ScrollIsSyncedWith (default: null, has to be set on both elements to be synced (name is 'scroll is', not 'scrolll s'))
 
 <br />
 
@@ -163,6 +164,8 @@ void mouseWheel (MouseEvent E) {
 - float TargetScrollY (default: 0)
 - float CurrScrollX (default: 0, this is where the children currently are)
 - float CurrScrollY (default: 0)
+- float PrevScrollX (default: 0)
+- float PrevScrollY (default: 0)
 - float ReachTargetSpeed (default: 0.4, this is the percentage the children will move each frame)
 
 <br />
@@ -196,10 +199,10 @@ void mouseWheel (MouseEvent E) {
 
 <br />
 
-- void Render()
+- void Render()  (this calls Update())
 - void Update()
 - void RenderWOUpdate()
-- void RenderThis() (doesn't call Render() on children)
+- void RenderThis()  (doesn't call Render() on children)
 - void UpdateThis()
 
 <br />
