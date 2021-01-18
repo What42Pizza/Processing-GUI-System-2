@@ -280,9 +280,183 @@ public class GUI_Element implements Cloneable {
   
   
   
-  public void Render() {
-    if (!Enabled) return;
-    //try {
+  public void Render() { // Call RenderThis() and UpdateThis() on this and children
+    if (Enabled) {
+      UpdateThis();
+      if (Visible) RenderThis();
+      RenderAndUpdateChildren();
+    }
+  }
+  
+  
+  
+  public void RenderWOUpdate() { // Call RenderThis() on this and children
+    RenderThis();
+    RenderChildren();
+  }
+  
+  
+  
+  public void Update() { // Call UpdateThis() on this and children
+    UpdateThis();
+    UpdateChildren();
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  public void CalcScreenData() {
+    
+    ScreenXPos = GUIFunctions.GetScreenX(XPos) + XPixelOffset;
+    ScreenYPos = GUIFunctions.GetScreenY(YPos) + YPixelOffset;
+    
+    switch (SizeIsConsistentWith) {
+      
+      case ("POSITION"):
+        int ScreenXEnd, ScreenYEnd;
+        ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
+        ScreenXSize = ScreenXEnd - ScreenXPos + XSizePixelOffset + XPixelOffset;
+        ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
+        ScreenYSize = ScreenYEnd - ScreenYPos + YSizePixelOffset + YPixelOffset;
+        break;
+      
+      case ("ITSELF"):
+        ScreenXSize = (int) (XSize * CustMatrix_ScaleX * width ) + XSizePixelOffset;
+        ScreenYSize = (int) (YSize * CustMatrix_ScaleY * height) + YSizePixelOffset;
+        break;
+      
+      default:
+        println ("Error in " + this + ": SizeIsConsitantWith has to be either " + '"' + "POSITION" + '"' + " or " + '"' + "ITSELF" + '"' + ".");
+        break;
+      
+    }
+    
+    ScreenPressedXPos = ScreenXPos + PressedXMove;
+    ScreenPressedYPos = ScreenYPos + PressedYMove;
+    
+    /*
+    To understand the extra math behind ITSELF, for ScreenX(/Y)Size you can look at GUIFunctions.GetScreenX as f(x), which equals (x * C + D) * E, where C = ScaleX, D = TranslateX, and E = width
+    This means f(a + b) = aCE + bCE + DE, but f(a) + f(b) = aCE + bCE + 2DE
+    If you consider PScrollX + XPos as a, and XSize as b, then what POSITION is calculating is f(a) - f(a + b), which equals aCE + bCE + DE - aCE - DE
+    aCE and DE cancle out, leaving just bCE
+    To calculate this easier (and more consistant), we skip all the extra steps and just calculate bCE.
+    */
+    
+  }
+  
+  
+  
+  
+  
+  public void RenderAndUpdateChildren() {
+    
+    PushMatrix();
+    Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
+    Scale (1 / XSize, 1 / YSize);
+    
+    /*
+    for (GUI_Element E : Children) { // Simplified version of code below (this code does the NotInFrame checks for every child instead of just once)
+      if (E.IsInFrame) {
+        E.Render();
+      } else {
+        if (RenderChildrenNotInFrame) {
+          E.Render();
+        } else if (UpdateChildrenNotInFrame) {
+          E.Render();
+        }
+      }
+    }
+    */
+    
+    if (RenderChildrenNotInFrame) { // Always render and update (Render = true, Update = true)
+      if (!UpdateChildrenNotInFrame) println ("Warning in " + this + ": UpdateChildrenNotInFrame is treated as true when RenderChildrenNotInFrame is true.");
+      
+      //println (this + " " + Children.size());
+      for (int i = 0; i < Children.size(); i ++) {
+        Children.get(i).Render();
+      }
+      
+    } else {
+      if (UpdateChildrenNotInFrame) { // Don't always render, but always update (Render = false, Update = true)
+        
+        for (GUI_Element E : Children) {
+          if (E.IsInFrame()) {
+            E.Render();
+          } else {
+            E.Update();
+          }
+        }
+        
+      } else { // Don't always render or update (Render = false, Update = false)
+        
+        for (GUI_Element E : Children) {
+          if (E.IsInFrame()) E.Render();
+        }
+        
+      }
+    }
+    
+    PopMatrix();
+  }
+  
+  
+  
+  
+  
+  public void RenderChildren() {
+    
+    PushMatrix();
+    Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
+    Scale (1 / XSize, 1 / YSize);
+    
+    if (RenderChildrenNotInFrame) {
+      
+      for (GUI_Element E : Children) {
+        E.RenderWOUpdate();
+      }
+      
+    } else {
+      
+      for (GUI_Element E : Children) {
+        if (E.IsInFrame()) E.RenderWOUpdate();
+      }
+      
+    }
+    
+    PopMatrix();
+  }
+  
+  
+  
+  
+  
+  public void UpdateChildren() {
+    
+    PushMatrix();
+    Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
+    Scale (1 / XSize, 1 / YSize);
+    
+    for (GUI_Element E : Children) {
+      E.Update();
+    }
+    
+    PopMatrix();
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  public void RenderThis() {
     
     PrevTextIsBeingEdited = TextIsBeingEdited;
     
@@ -290,9 +464,6 @@ public class GUI_Element implements Cloneable {
       println ("ERROR: " + this + " HAS BEEN DELETED. REMOVE ALL POINTERS TO THIS OBJECT.");
       return;
     }
-    
-    Update();
-    if (Deleted) return; // CustomAction might delete its own caller
     
     CalcScreenData();
     
@@ -302,18 +473,16 @@ public class GUI_Element implements Cloneable {
       RenderText();
     }
     
-    if (Enabled)
-      RenderChildren();
-    
     PrevMousePressed = mousePressed;
     PrevPressed = Pressed;
     
-    //} catch (Exception e) {println (this);}
   }
   
   
   
-  public void Update() {
+  
+  
+  public void UpdateThis() {
     
     if (this.JustClicked()) {
       if (!ButtonAction.equals("None")) GUIFunctions.ExecuteAction (ButtonAction, this);
@@ -343,6 +512,13 @@ public class GUI_Element implements Cloneable {
   
   
   
+  
+  
+  
+  
+  
+  
+    
   public void UpdateDragging() {
     
     if (IsDragging) {
@@ -460,6 +636,11 @@ public class GUI_Element implements Cloneable {
   
   
   
+  
+  
+  
+  
+  
   public void RenderFrame() {
     
     if (HasFrame) {
@@ -519,102 +700,6 @@ public class GUI_Element implements Cloneable {
   
   
   
-  public void CalcScreenData() {
-    
-    ScreenXPos = GUIFunctions.GetScreenX(XPos) + XPixelOffset;
-    ScreenYPos = GUIFunctions.GetScreenY(YPos) + YPixelOffset;
-    
-    switch (SizeIsConsistentWith) {
-      
-      case ("POSITION"):
-        int ScreenXEnd, ScreenYEnd;
-        ScreenXEnd  = GUIFunctions.GetScreenX (XPos + XSize);
-        ScreenXSize = ScreenXEnd - ScreenXPos + XSizePixelOffset + XPixelOffset;
-        ScreenYEnd  = GUIFunctions.GetScreenY (YPos + YSize);
-        ScreenYSize = ScreenYEnd - ScreenYPos + YSizePixelOffset + YPixelOffset;
-        break;
-      
-      case ("ITSELF"):
-        ScreenXSize = (int) (XSize * CustMatrix_ScaleX * width ) + XSizePixelOffset;
-        ScreenYSize = (int) (YSize * CustMatrix_ScaleY * height) + YSizePixelOffset;
-        break;
-      
-      default:
-        println ("Error in " + this + ": SizeIsConsitantWith has to be either " + '"' + "POSITION" + '"' + " or " + '"' + "ITSELF" + '"' + ".");
-        break;
-      
-    }
-    
-    ScreenPressedXPos = ScreenXPos + PressedXMove;
-    ScreenPressedYPos = ScreenYPos + PressedYMove;
-    
-    /*
-    To understand the extra math behind ITSELF, for ScreenX(/Y)Size you can look at GUIFunctions.GetScreenX as f(x), which equals (x * C + D) * E, where C = ScaleX, D = TranslateX, and E = width
-    This means f(a + b) = aCE + bCE + DE, but f(a) + f(b) = aCE + bCE + 2DE
-    If you consider PScrollX + XPos as a, and XSize as b, then what POSITION is calculating is f(a) - f(a + b), which equals aCE + bCE + DE - aCE - DE
-    aCE and DE cancle out, leaving just bCE
-    To calculate this easier (and more consistant), we skip all the extra steps and just calculate bCE.
-    */
-    
-  }
-  
-  
-  
-  public void RenderChildren() {
-    
-    PushMatrix();
-    Translate (XPos + CurrScrollX * XSize, YPos + CurrScrollY * YSize);
-    Scale (1 / XSize, 1 / YSize);
-    
-    /*
-    for (GUI_Element E : Children) { // Simplified version of code below (this code does the NotInFrame checks for every child instead of just once)
-      if (E.IsInFrame) {
-        E.Render();
-      } else {
-        if (RenderChildrenNotInFrame) {
-          E.Render();
-        } else if (UpdateChildrenNotInFrame) {
-          E.Render();
-        }
-      }
-    }
-    */
-    
-    if (RenderChildrenNotInFrame) { // Always render and update (Render = true, Update = true)
-      if (!UpdateChildrenNotInFrame) println ("Warning in " + this + ": UpdateChildrenNotInFrame is treated as true when RenderChildrenNotInFrame is true.");
-      
-      //println (this + " " + Children.size());
-      for (int i = 0; i < Children.size(); i ++) {
-        Children.get(i).Render();
-      }
-      
-    } else {
-      if (UpdateChildrenNotInFrame) { // Don't always render, but always update (Render = false, Update = true)
-        
-        for (GUI_Element E : Children) {
-          if (E.IsInFrame()) {
-            E.Render();
-          } else {
-            E.Update();
-          }
-        }
-        
-      } else { // Don't always render or update (Render = false, Update = false)
-        
-        for (GUI_Element E : Children) {
-          if (E.IsInFrame()) {
-            E.Render();
-          }
-        }
-        
-      }
-    }
-    
-    PopMatrix();
-  }
-  
-  
-  
   
   
   
@@ -669,7 +754,7 @@ public class GUI_Element implements Cloneable {
   
   
   
-  public GUI_Element Child (String ChildName) {
+  public GUI_Element Child (String ChildName, boolean PrintError) {
     if (ChildName == null) {
       println ("Error in " + this + ": You cannot search for a child with a null name.");
       return null;
@@ -679,7 +764,26 @@ public class GUI_Element implements Cloneable {
         return E;
       }
     }
+    if (PrintError) println ("WARNING: GUI_Element " + ChildName + " could not be found in " + this + ".");
     return null;
+  }
+  
+  public GUI_Element Child (String ChildName) {
+    return Child (ChildName, true);
+  }
+  
+  
+  
+  public GUI_Element Sibling (String SiblingName, boolean PrintError) {
+    if (Parent == null) {
+      if (PrintError) println ("Error in " + this + ": Sibling() called (with argument " + '"' + SiblingName + '"' + "), but Parent == null.");
+      return null;
+    }
+    return Parent.Child(SiblingName, PrintError);
+  }
+  
+  public GUI_Element Sibling (String SiblingName) {
+    return Sibling (SiblingName, true);
   }
   
   

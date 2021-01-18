@@ -197,6 +197,10 @@ void mouseWheel (MouseEvent E) {
 <br />
 
 - void Render()
+- void Update()
+- void RenderWOUpdate()
+- void RenderThis() (doesn't call Render() on children)
+- void UpdateThis()
 
 <br />
 
@@ -463,4 +467,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 01/13/21
+Last updated 01/18/21
