@@ -528,7 +528,7 @@ public class GUI_Element implements Cloneable {
   
   public void UpdatePressed() {
     if (Pressed) {
-      Pressed = mousePressed || this.HasMouseHovering() || (ButtonKey != -1 && GUIFunctions.KeyIsPressed (ButtonKey)); // Stay pressed unitl none are true
+      Pressed = (mousePressed && this.HasMouseHovering()) || (ButtonKey != -1 && GUIFunctions.KeyIsPressed (ButtonKey)); // Stay pressed unitl none are true
     } else {
       Pressed = this.JustClicked(); // Start being pressed if just not clicked
     }
@@ -564,34 +564,44 @@ public class GUI_Element implements Cloneable {
   
   
   public void UpdateScrolling() {
-    
     if (CanScroll && HasMouseHovering()) {
-      
-      float MouseScrollAmount = GUIFunctions.GetScrollAmount() * (InvertedScrolling ? 1 : -1); // Get amount scrolled
-      if (MouseScrollAmount != 0) {
+      float ScrollAmount = GUIFunctions.GetScrollAmount() * (InvertedScrolling ? 1 : -1); // Get amount scrolled
+      if (ScrollAmount != 0) {
         
-        float TotalScreenPercentX = (float) ScreenXSize / width ; // Get screen size because smaller frames need more scroll added to ScrollAmount
-        float TotalScreenPercentY = (float) ScreenYSize / height;
+        // Determin scroll amount
+        float ScrollAmountX = ScrollAmount * ScrollSpeedX;
+        float ScrollAmountY = ScrollAmount * ScrollSpeedY;
         
-        float ScrollAmountX = (float) 1/TotalScreenPercentX * ScrollSpeedX / 75 * MouseScrollAmount; // Determin amount of scrolling needed
-        float ScrollAmountY = (float) 1/TotalScreenPercentY * ScrollSpeedY / 75 * MouseScrollAmount; // 1/TotalScPer is because a frame of 1/3 size of screen needs 3x more scrolling. * ScrollSpeed is to make it faster. / 100 is to slow it down because normally it's way too much. * MouseScrollAmount is to make it react to the actual amount of scrolling.
+        // Scroll this
+        Scroll (ScrollAmountX, ScrollAmountY);
         
-        TargetScrollX += ScrollAmountX; // Add scrolling
-        TargetScrollY += ScrollAmountY;
-        
+        // Scroll synced elements
         if (ScrollIsSyncedWith != null) for (GUI_Element E : ScrollIsSyncedWith) {
-          E.TargetScrollX += ScrollAmountX;
-          E.TargetScrollY += ScrollAmountY;
-          E.ConstrainScroll();
+          E.Scroll (ScrollAmountX, ScrollAmountY);
           E.SetCurrScroll();
         }
         
-        ConstrainScroll();
-        
       }
     }
-    
     SetCurrScroll();
+  }
+  
+  
+  
+  public void Scroll (float ScrollAmountX, float ScrollAmountY) {
+    
+     // Get screen size because smaller frames need more scroll added to ScrollAmount
+    float TotalScreenPercentX = (float) ScreenXSize / width ;
+    float TotalScreenPercentY = (float) ScreenYSize / height;
+    
+    // Determin amount of scrolling needed
+    ScrollAmountX = (float) 1/TotalScreenPercentX * ScrollSpeedX / 50 * ScrollAmountX;
+    ScrollAmountY = (float) 1/TotalScreenPercentY * ScrollSpeedY / 50 * ScrollAmountY; // 1/TotalScPer is because a frame of 1/3 size of screen needs 3x more scrolling. * ScrollSpeed is to make it faster. / 100 is to slow it down because normally it's way too much. * MouseScrollAmount is to make it react to the actual amount of scrolling.
+    
+    // Set new scroll target
+    TargetScrollX += ScrollAmountX;
+    TargetScrollY += ScrollAmountY;
+    ConstrainScroll();
     
   }
   
