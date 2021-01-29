@@ -91,7 +91,6 @@ public class GUI_Element implements Cloneable {
   public String FullName = "";
   
   public boolean IsDragging = false;
-  public boolean PrevMousePressed = false;
   public int Dragging_StartMouseX;
   public int Dragging_StartMouseY;
   public float Dragging_StartXPos;
@@ -312,6 +311,7 @@ public class GUI_Element implements Cloneable {
   public void Render() { // Call RenderThis() and UpdateThis() on this and children
     if (Enabled) {
       UpdateThis();
+      if (Deleted) return;
       UpdateChildren();
       if (Visible) RenderThis();
       RenderChildren();
@@ -333,6 +333,7 @@ public class GUI_Element implements Cloneable {
   public void Update() { // Call UpdateThis() on this and children
     if (Enabled) {
       UpdateThis();
+      if (Deleted) return;
       UpdateChildren();
     }
   }
@@ -457,12 +458,6 @@ public class GUI_Element implements Cloneable {
     RenderImage();
     RenderText();
     
-    PrevMousePressed = mousePressed;
-    PrevPressed = Pressed;
-    PrevScrollX = CurrScrollX;
-    PrevScrollY = CurrScrollY;
-    PrevTextIsBeingEdited = TextIsBeingEdited;
-    
   }
   
   
@@ -477,7 +472,7 @@ public class GUI_Element implements Cloneable {
     }
     
     if (Parent == null) {
-      GUIFunctions.GetNewKeyPresses(); // Just update keys and scroll (if this is a top ancestor) because not updating them can have bad effects when they are finally called
+      //GUIFunctions.GetNewKeyPresses(); // Just update keys and scroll (if this is a top ancestor) because not updating them can have bad effects when they are finally called
       GUIFunctions.GetScrollAmount();
     }
     
@@ -488,6 +483,11 @@ public class GUI_Element implements Cloneable {
     if (OnTextFinished != null && UserStoppedEditingText()) OnTextFinished.Run (this);
     
     UpdateScrolling();
+    
+    PrevPressed = Pressed;
+    PrevScrollX = CurrScrollX;
+    PrevScrollY = CurrScrollY;
+    PrevTextIsBeingEdited = TextIsBeingEdited;
     
   }
   
@@ -528,7 +528,7 @@ public class GUI_Element implements Cloneable {
   
   public void UpdatePressed() {
     if (Pressed) {
-      Pressed = (mousePressed && this.HasMouseHovering()) || (ButtonKey != -1 && GUIFunctions.KeyIsPressed (ButtonKey)); // Stay pressed unitl none are true
+      Pressed = (mousePressed && this.HasMouseHovering()) || (ButtonKey != -1 && GUIFunctions.KeyIsPressed (ButtonKey)); // Stay pressed unitl neither are true
     } else {
       Pressed = this.JustClicked(); // Start being pressed if just not clicked
     }
@@ -540,7 +540,7 @@ public class GUI_Element implements Cloneable {
     
     boolean EscKeyPressed = GUIFunctions.KeyJustPressed (27);
     boolean EnterKeyPressed = GUIFunctions.KeyJustPressed (10);
-    if (TextIsBeingEdited && (EscKeyPressed || EnterKeyPressed || (mousePressed && !PrevMousePressed && !this.HasMouseHovering()))) {
+    if (TextIsBeingEdited && (EscKeyPressed || EnterKeyPressed || (GUIFunctions.MouseJustClicked() && !this.HasMouseHovering()))) {
       if (EscKeyPressed) GUIFunctions.EscKeyUsed = true;
       TextIsBeingEdited = false;
       if (Text.equals("") && UsePlaceholderText)
@@ -970,7 +970,7 @@ public class GUI_Element implements Cloneable {
   
   public boolean JustClicked() {
     if (ButtonKey != -1 && GUIFunctions.KeyJustPressed (ButtonKey)) return true;
-    return (mousePressed && !PrevMousePressed && this.HasMouseHovering());
+    return (GUIFunctions.MouseJustClicked() && this.HasMouseHovering());
   }
   
   public boolean JustReleased() {

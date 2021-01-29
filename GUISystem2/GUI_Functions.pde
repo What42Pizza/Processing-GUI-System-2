@@ -112,8 +112,6 @@ public class GUI_Functions {
   
   ArrayList <GUI_Element> AllGUIElements = new ArrayList <GUI_Element> ();
   
-  
-  
   boolean EscKeyUsed = false;
   
   
@@ -125,18 +123,15 @@ public class GUI_Functions {
   
   
   
-  int LastUpdatedCount_Keys = 1; // >:(
-  Character[] NewKeyPresses = new Character [0];
-  ArrayList <Character> NewKeyPressesBuffer = new ArrayList <Character> ();
-  
+  int LastUpdatedCount_Keys = frameCount;
   boolean[] Keys = new boolean [128];
   boolean[] PrevKeys = new boolean [128];
+  boolean[] KeysBuffer = new boolean [128];
   
   
   
   public void keyPressed() {
     if (key < 128) Keys[key] = true;
-    NewKeyPressesBuffer.add (key);
   }
   
   public void keyReleased() {
@@ -145,26 +140,32 @@ public class GUI_Functions {
   
   
   
-  public Character[] GetNewKeyPresses() {
+  public char[] GetNewKeyPresses() {
     
-    if (LastUpdatedCount_Keys != frameCount) { // If this is a start of a new frame
+    // Update PrevKeys
+    if (LastUpdatedCount_Keys != frameCount) {
       LastUpdatedCount_Keys = frameCount;
-      NewKeyPresses = new Character [NewKeyPressesBuffer.size()];
-      for (int i = 0; i < NewKeyPresses.length; i ++)
-        NewKeyPresses[i] = NewKeyPressesBuffer.get(i);
-      NewKeyPressesBuffer = new ArrayList <Character> ();
+      PrevKeys = KeysBuffer.clone();
+      KeysBuffer = Keys.clone();
     }
     
-    return NewKeyPresses;
+    // Add all new keys to ArrayList
+    ArrayList <Character> NewKeyPresses = new ArrayList <Character> ();
+    for (int i = 0; i < Keys.length; i ++) {
+      if (Keys[i] && !PrevKeys[i]) NewKeyPresses.add (char (i));
+    }
+    
+    // Convert and return ArrayList
+    char[] Output = new char [NewKeyPresses.size()];
+    for (int i = 0; i < Output.length; i ++) Output[i] = NewKeyPresses.get(i);
+    return Output;
     
   }
   
   
   
   public boolean KeyJustPressed (int Key) {
-    for (Character C : NewKeyPresses) {
-      if (C == Key) return true;
-    }
+    if (Key < 128) return Keys[Key] && !PrevKeys[Key];
     return false;
   }
   
@@ -179,7 +180,7 @@ public class GUI_Functions {
   
   
   
-  int LastUpdatedCount_Scroll = 1;
+  int LastUpdatedCount_Scroll = frameCount;
   float ScrollAmount = 0;
   float ScrollAmountBuffer = 0;
   
@@ -190,15 +191,29 @@ public class GUI_Functions {
   
   
   public float GetScrollAmount() {
-    
     if (LastUpdatedCount_Scroll != frameCount) {
       LastUpdatedCount_Scroll = frameCount;
       ScrollAmount = ScrollAmountBuffer;
       ScrollAmountBuffer = 0;
     }
-    
     return ScrollAmount;
-    
+  }
+  
+  
+  
+  
+  
+  int LastUpdatedCount_MousePressed = frameCount;
+  boolean PrevMousePressed = false;
+  boolean MousePressedBuffer = false;
+  
+  public boolean MouseJustClicked() {
+    if (LastUpdatedCount_MousePressed != frameCount) {
+      LastUpdatedCount_MousePressed = frameCount;
+      PrevMousePressed = MousePressedBuffer;
+      MousePressedBuffer = mousePressed;
+    }
+    return mousePressed && !PrevMousePressed;
   }
   
   

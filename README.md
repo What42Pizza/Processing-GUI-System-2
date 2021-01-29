@@ -22,7 +22,7 @@ void keyPressed() {
   if (key == 27) key = 0;
 }
 
-void keyReleased() { // (optional for now)
+void keyReleased() { // NO LONGER OPTIONAL
   GUIFunctions.keyReleased();
 }
 
@@ -470,4 +470,4 @@ This was added because text can look weird while the frame is moving. When set t
 <br />
 <br />
 
-Last updated 01/21/21
+Last updated 01/29/21
